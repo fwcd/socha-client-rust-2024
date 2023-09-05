@@ -1,0 +1,15 @@
+[package]
+name = "socha-client-2024"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "3.2", features = ["derive"] }
+log = "0.4"
+simplelog = "0.12"
+rand = "0.8"
+quick-xml = "0.23"
+arrayvec = "0.7"
+indoc = "1.0"
