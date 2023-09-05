@@ -94,7 +94,7 @@ mod tests {
 
     use indoc::indoc;
 
-    use crate::{game::{State, Ship, CubeVec, Team, CubeDir}, util::Element};
+    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field}, util::Element};
 
     #[test]
     fn test_from_xml() {
@@ -173,7 +173,44 @@ mod tests {
                 </ship>
             </state>
         "#}).unwrap()).unwrap(), State {
-            board: todo!(),
+            board: Board {
+                segments: vec![
+                    Segment {
+                        direction: CubeDir::Right,
+                        center: CubeVec::ZERO,
+                        fields: vec![vec![Field::Water; 5]; 4],
+                    },
+                    Segment {
+                        direction: CubeDir::Right,
+                        center: CubeVec::new(0, 4, -4),
+                        fields: vec![
+                            vec![
+                                Field::Water,
+                                Field::Water,
+                                Field::Water,
+                                Field::Island,
+                                Field::Water,
+                            ],
+                            vec![
+                                Field::Island,
+                                Field::Water,
+                                Field::Water,
+                                Field::Water,
+                                Field::Water,
+                            ],
+                            vec![
+                                Field::Passenger { direction: CubeDir::DownRight, passenger: 1 },
+                                Field::Water,
+                                Field::Water,
+                                Field::Water,
+                                Field::Water,
+                            ],
+                            vec![Field::Water; 5],
+                        ],
+                    },
+                ],
+                next_direction: CubeDir::DownRight,
+            },
             ships: [
                 Ship {
                     position: CubeVec::new(-1, -1, 2),
@@ -185,7 +222,7 @@ mod tests {
                     points: 0,
                 },
                 Ship {
-                    position: CubeVec::new(1, 1, -2),
+                    position: CubeVec::new(1, -2, 1),
                     direction: CubeDir::Right,
                     speed: 1,
                     free_turns: 1,

@@ -6,8 +6,8 @@ use super::{CubeDir, Segment};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Board {
-    segments: Vec<Segment>,
-    next_direction: CubeDir,
+    pub segments: Vec<Segment>,
+    pub next_direction: CubeDir,
 }
 
 impl TryFrom<&Element> for Board {

@@ -6,9 +6,9 @@ use super::{CubeDir, CubeVec, Field};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Segment {
-    direction: CubeDir,
-    center: CubeVec,
-    fields: Vec<Vec<Field>>,
+    pub direction: CubeDir,
+    pub center: CubeVec,
+    pub fields: Vec<Vec<Field>>,
 }
 
 impl TryFrom<&Element> for Segment {
