@@ -24,4 +24,20 @@ macro_rules! assert_xml_parse {
     };
 }
 
+macro_rules! assert_xml_format {
+    ($actual:expr, $xml:expr) => {
+        {
+            use ::std::str::FromStr;
+
+            use crate::util::Element;
+
+            assert_eq!(
+                Element::try_from($actual).unwrap(),
+                Element::from_str($xml).unwrap()
+            )
+        }
+    };
+}
+
 pub(crate) use assert_xml_parse;
+pub(crate) use assert_xml_format;

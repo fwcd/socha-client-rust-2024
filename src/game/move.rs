@@ -19,3 +19,13 @@ impl From<Move> for Element {
         todo!()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{util::assert_xml_format, game::Move};
+
+    #[test]
+    fn test_to_xml() {
+        assert_xml_format!(Move, "");
+    }
+}
