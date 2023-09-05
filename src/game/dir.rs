@@ -14,6 +14,18 @@ pub enum CubeDir {
     UpRight,
 }
 
+impl CubeDir {
+    /// Every available direction.
+    pub const ALL: [Self; 6] = [
+        Self::Right,
+        Self::DownRight,
+        Self::DownLeft,
+        Self::Left,
+        Self::UpLeft,
+        Self::UpRight,
+    ];
+}
+
 impl fmt::Display for CubeDir {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

@@ -2,6 +2,8 @@ use std::{fmt, ops::{Add, Sub, Mul, Div, DivAssign, MulAssign, AddAssign, SubAss
 
 use crate::util::{Element, Error, Result};
 
+use super::CubeDir;
+
 /// A cube coordinate vector (or position).
 /// (see https://www.redblobgames.com/grids/hexagons/#coordinates-cube).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -20,25 +22,6 @@ impl Default for CubeVec {
 impl CubeVec {
     /// The coordinate origin or zero direction vector, i.e. (0, 0, 0).
     pub const ZERO: Self = Self::new(0, 0, 0);
-
-    pub const RIGHT: Self = Self::rq(1, 0);
-    pub const DOWN_RIGHT: Self = Self::rq(0, 1);
-    pub const DOWN_LEFT: Self = Self::rq(-1, 1);
-    pub const LEFT: Self = Self::rq(-1, 0);
-    pub const UP_LEFT: Self = Self::rq(0, -1);
-    pub const UP_RIGHT: Self = Self::rq(1, -1);
-
-    // TODO: Move these to a `From<CubeDir>` implementation
-
-    /// The unit vector for each direction.
-    pub const DIRECTIONS: [Self; 6] = [
-        Self::RIGHT,
-        Self::DOWN_RIGHT,
-        Self::DOWN_LEFT,
-        Self::LEFT,
-        Self::UP_LEFT,
-        Self::UP_RIGHT,
-    ];
 
     /// Creates a new vector from the given cube components.
     #[inline]
@@ -74,7 +57,7 @@ impl CubeVec {
 
     /// Fetches the 6 hex neighbors.
     pub fn hex_neighbors(self) -> [Self; 6] {
-        Self::DIRECTIONS.map(|v| self + v)
+        CubeDir::ALL.map(|v| self + v)
     }
 }
 
@@ -86,11 +69,25 @@ impl Add for CubeVec {
     }
 }
 
+impl Add<CubeDir> for CubeVec {
+    type Output = Self;
+
+    fn add(self, rhs: CubeDir) -> Self::Output {
+        self + Self::from(rhs)
+    }
+}
+
 impl AddAssign<CubeVec> for CubeVec {
     fn add_assign(&mut self, rhs: Self) {
         self.r += rhs.r;
         self.q += rhs.q;
         self.s += rhs.s;
+    }
+}
+
+impl AddAssign<CubeDir> for CubeVec {
+    fn add_assign(&mut self, rhs: CubeDir) {
+        *self += Self::from(rhs);
     }
 }
 
@@ -102,11 +99,25 @@ impl Sub for CubeVec {
     }
 }
 
+impl Sub<CubeDir> for CubeVec {
+    type Output = Self;
+
+    fn sub(self, rhs: CubeDir) -> Self::Output {
+        self - Self::from(rhs)
+    }
+}
+
 impl SubAssign<CubeVec> for CubeVec {
     fn sub_assign(&mut self, rhs: Self) {
         self.r -= rhs.r;
         self.q -= rhs.q;
         self.s -= rhs.s;
+    }
+}
+
+impl SubAssign<CubeDir> for CubeVec {
+    fn sub_assign(&mut self, rhs: CubeDir) {
+        *self -= Self::from(rhs);
     }
 }
 
@@ -153,6 +164,19 @@ impl DivAssign<i32> for CubeVec {
 impl fmt::Display for CubeVec {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {}, {})", self.r, self.q, self.s)
+    }
+}
+
+impl From<CubeDir> for CubeVec {
+    fn from(dir: CubeDir) -> Self {
+        match dir {
+            CubeDir::Right => Self::rq(1, 0),
+            CubeDir::DownRight => Self::rq(0, 1),
+            CubeDir::DownLeft => Self::rq(-1, 1),
+            CubeDir::Left => Self::rq(-1, 0),
+            CubeDir::UpLeft => Self::rq(0, -1),
+            CubeDir::UpRight => Self::rq(1, -1),
+        }
     }
 }
 
