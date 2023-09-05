@@ -142,6 +142,11 @@ impl Element {
     pub fn attribute(&self, key: &str) -> Result<&str> {
         self.attributes.get(key).map(|s| s.as_str()).ok_or_else(|| format!("No attribute with key '{}' found in <{}>!", key, self.name).into())
     }
+
+    /// Fetches the childs.
+    pub fn childs<'a>(&'a self) -> impl Iterator<Item=&'a Element> {
+        self.childs.iter()
+    }
     
     /// Finds the first child element with the provided tag name.
     pub fn child_by_name<'a, 'n: 'a>(&'a self, name: &'n str) -> Result<&'a Element> {

@@ -15,6 +15,14 @@ impl TryFrom<&Element> for Segment {
     type Error = Error;
 
     fn try_from(elem: &Element) -> Result<Self> {
-        todo!()
+        Ok(Self {
+            direction: elem.attribute("direction")?.parse()?,
+            center: elem.child_by_name("center")?.try_into()?,
+            fields: elem.childs_by_name("field-array")
+                .map(|fa| fa.childs()
+                    .map(Field::try_from)
+                    .collect::<Result<Vec<_>>>())
+                .collect::<Result<Vec<_>>>()?,
+        })
     }
 }

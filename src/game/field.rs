@@ -16,6 +16,16 @@ impl TryFrom<&Element> for Field {
     type Error = Error;
 
     fn try_from(elem: &Element) -> Result<Self> {
-        todo!()
+        match elem.name() {
+            // TODO: Check whether the serialized names are correct
+            "water" => Ok(Field::Water),
+            "island" => Ok(Field::Island),
+            "passenger" => Ok(Field::Passenger {
+                direction: elem.attribute("direction")?.parse()?,
+                passenger: elem.attribute("passenger")?.parse()?,
+            }),
+            "goal" => Ok(Field::Goal),
+            t => Err(Error::UnknownVariant(format!("Unknown field type: {}", t))),
+        }
     }
 }
