@@ -1,4 +1,4 @@
-macro_rules! assert_xml_parses {
+macro_rules! assert_xml_parse {
     ($xml:expr, $expected:expr) => {
         {
             use ::std::{str::FromStr, fmt::Debug};
@@ -24,4 +24,4 @@ macro_rules! assert_xml_parses {
     };
 }
 
-pub(crate) use assert_xml_parses;
+pub(crate) use assert_xml_parse;

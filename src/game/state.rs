@@ -92,12 +92,12 @@ impl TryFrom<&Element> for State {
 mod tests {
     use indoc::indoc;
 
-    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field}, util::assert_xml_parses};
+    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field}, util::assert_xml_parse};
 
     #[test]
     fn test_from_xml() {
         // TODO: Test the sub-structures too
-        assert_xml_parses!(indoc! {r#"
+        assert_xml_parse!(indoc! {r#"
             <state startTeam="ONE" class="state" turn="0" currentTeam="ONE">
                 <board nextDirection="DOWN_RIGHT">
                     <segment direction="RIGHT">

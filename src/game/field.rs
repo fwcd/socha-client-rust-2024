@@ -34,13 +34,13 @@ impl TryFrom<&Element> for Field {
 
 #[cfg(test)]
 mod tests {
-    use crate::{util::assert_xml_parses, game::Field};
+    use crate::{util::assert_xml_parse, game::Field};
 
     #[test]
     fn test_from_xml() {
-        assert_xml_parses!(r#"<water />"#, Field::Water);
-        assert_xml_parses!(r#"<island />"#, Field::Island);
-        assert_xml_parses!(r#"<goal />"#, Field::Goal);
-        assert_xml_parses!(r#"<sandbank />"#, Field::Sandbank);
+        assert_xml_parse!(r#"<water />"#, Field::Water);
+        assert_xml_parse!(r#"<island />"#, Field::Island);
+        assert_xml_parse!(r#"<goal />"#, Field::Goal);
+        assert_xml_parse!(r#"<sandbank />"#, Field::Sandbank);
     }
 }

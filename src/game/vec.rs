@@ -194,11 +194,11 @@ impl TryFrom<&Element> for CubeVec {
 
 #[cfg(test)]
 mod tests {
-    use crate::{util::assert_xml_parses, game::CubeVec};
+    use crate::{util::assert_xml_parse, game::CubeVec};
 
     #[test]
     fn test_from_xml() {
-        assert_xml_parses!(
+        assert_xml_parse!(
             r#"<position r="23" q="0" s="-2" />"#,
             CubeVec::new(23, 0, -2)
         );
