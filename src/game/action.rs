@@ -33,7 +33,7 @@ impl TryFrom<&Element> for Action {
     type Error = Error;
 
     fn try_from(elem: &Element) -> Result<Self> {
-        match elem.attribute("class")? {
+        match elem.name() {
             "acceleration" => Ok(Self::Accelerate { acc: elem.attribute("acc")?.parse()? }),
             "advance" => Ok(Self::Advance { distance: elem.attribute("distance")?.parse()? }),
             "push" => Ok(Self::Push { direction: elem.attribute("direction")?.parse()? }),
@@ -45,22 +45,17 @@ impl TryFrom<&Element> for Action {
 
 impl From<Action> for Element {
     fn from(m: Action) -> Self {
-        let base = Element::new("data");
         match m {
-            Action::Accelerate { acc } => base
-                .attribute("class", "acceleration")
+            Action::Accelerate { acc } => Element::new("acceleration")
                 .attribute("acc", acc)
                 .build(),
-            Action::Advance { distance } => base
-                .attribute("class", "advance")
+            Action::Advance { distance } => Element::new("advance")
                 .attribute("distance", distance)
                 .build(),
-            Action::Push { direction } => base
-                .attribute("class", "push")
+            Action::Push { direction } => Element::new("push")
                 .attribute("direction", direction)
                 .build(),
-            Action::Turn { direction } => base
-                .attribute("class", "turn")
+            Action::Turn { direction } => Element::new("turn")
                 .attribute("direction", direction)
                 .build(),
         }
