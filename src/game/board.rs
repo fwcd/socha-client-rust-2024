@@ -2,13 +2,23 @@
 
 use crate::util::{Element, Error, Result};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Board;
+use super::{CubeDir, Segment};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Board {
+    segments: Vec<Segment>,
+    next_direction: CubeDir,
+}
 
 impl TryFrom<&Element> for Board {
     type Error = Error;
 
     fn try_from(elem: &Element) -> Result<Self> {
-        todo!()
+        Ok(Self {
+            segments: elem.childs_by_name("segment")
+                .map(Segment::try_from)
+                .collect::<Result<Vec<Segment>>>()?,
+            next_direction: elem.attribute("nextDirection")?.parse()?,
+        })
     }
 }

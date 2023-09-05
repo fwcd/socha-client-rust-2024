@@ -7,7 +7,7 @@ use crate::util::{Element, Error, Result};
 use super::{Board, Move, Team, Ship};
 
 /// The state of the game at a point in time.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct State {
     /// The game board.
     board: Board,
@@ -61,7 +61,7 @@ impl State {
 
     /// Fetches the state after the given move.
     pub fn child(&self, m: Move) -> Self {
-        let mut next = *self;
+        let mut next = self.clone();
         next.perform(m);
         next
     }
