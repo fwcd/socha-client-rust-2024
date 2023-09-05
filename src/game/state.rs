@@ -94,7 +94,7 @@ mod tests {
 
     use indoc::indoc;
 
-    use crate::{game::{State, Ship, CubeVec, Team}, util::Element};
+    use crate::{game::{State, Ship, CubeVec, Team, CubeDir}, util::Element};
 
     #[test]
     fn test_from_xml() {
@@ -176,7 +176,7 @@ mod tests {
             ships: [
                 Ship {
                     position: CubeVec::new(-1, -1, 2),
-                    direction: CubeVec::RIGHT,
+                    direction: CubeDir::Right,
                     speed: 1,
                     free_turns: 1,
                     coal: 6,
@@ -185,7 +185,7 @@ mod tests {
                 },
                 Ship {
                     position: CubeVec::new(1, 1, -2),
-                    direction: CubeVec::RIGHT,
+                    direction: CubeDir::Right,
                     speed: 1,
                     free_turns: 1,
                     coal: 6,

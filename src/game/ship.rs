@@ -2,13 +2,13 @@
 
 use crate::util::{Element, Error, Result};
 
-use super::{CubeVec, MIN_SPEED, START_COAL};
+use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir};
 
 /// A player's game piece.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Ship {
     pub position: CubeVec,
-    pub direction: CubeVec,
+    pub direction: CubeDir,
     pub speed: usize,
     pub coal: usize,
     pub passengers: usize,
@@ -20,7 +20,7 @@ impl Default for Ship {
     fn default() -> Self {
         Self {
             position: CubeVec::ZERO,
-            direction: CubeVec::RIGHT,
+            direction: CubeDir::Right,
             speed: MIN_SPEED,
             coal: START_COAL,
             passengers: 0,
@@ -34,6 +34,14 @@ impl TryFrom<&Element> for Ship {
     type Error = Error;
 
     fn try_from(elem: &Element) -> Result<Self> {
-        todo!()
+        Ok(Self {
+            position: elem.child_by_name("position")?.try_into()?,
+            direction: elem.attribute("direction")?.parse()?,
+            speed: elem.attribute("speed")?.parse()?,
+            coal: elem.attribute("coal")?.parse()?,
+            passengers: elem.attribute("passengers")?.parse()?,
+            free_turns: elem.attribute("freeTurns")?.parse()?,
+            points: elem.attribute("points")?.parse()?,
+        })
     }
 }

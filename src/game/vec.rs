@@ -28,6 +28,8 @@ impl CubeVec {
     pub const UP_LEFT: Self = Self::rq(0, -1);
     pub const UP_RIGHT: Self = Self::rq(1, -1);
 
+    // TODO: Move these to a `From<CubeDir>` implementation
+
     /// The unit vector for each direction.
     pub const DIRECTIONS: [Self; 6] = [
         Self::RIGHT,
