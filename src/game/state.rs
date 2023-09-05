@@ -98,6 +98,7 @@ mod tests {
 
     #[test]
     fn test_from_xml() {
+        // TODO: Test the sub-structures too
         assert_eq!(State::try_from(&Element::from_str(indoc! {r#"
             <state startTeam="ONE" class="state" turn="0" currentTeam="ONE">
                 <board nextDirection="DOWN_RIGHT">
