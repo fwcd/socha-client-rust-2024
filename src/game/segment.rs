@@ -26,3 +26,53 @@ impl TryFrom<&Element> for Segment {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use indoc::indoc;
+
+    use crate::{game::{Segment, CubeDir, CubeVec, Field}, util::Element};
+
+    #[test]
+    fn test_from_xml() {
+        assert_eq!(Segment::try_from(&Element::from_str(indoc! {r#"
+            <segment direction="RIGHT">
+                <center q="0" r="0" s="0" />
+                <field-array>
+                    <water />
+                    <water />
+                    <water />
+                    <water />
+                    <water />
+                </field-array>
+                <field-array>
+                    <water />
+                    <water />
+                    <water />
+                    <water />
+                    <water />
+                </field-array>
+                <field-array>
+                    <water />
+                    <water />
+                    <water />
+                    <water />
+                    <water />
+                </field-array>
+                <field-array>
+                    <water />
+                    <water />
+                    <water />
+                    <water />
+                    <water />
+                </field-array>
+            </segment>
+        "#}).unwrap()).unwrap(), Segment {
+            direction: CubeDir::Right,
+            center: CubeVec::ZERO,
+            fields: vec![vec![Field::Water; 5]; 4],
+        })
+    }
+}

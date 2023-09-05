@@ -10,6 +10,7 @@ pub enum Field {
     Island,
     Passenger { direction: CubeDir, passenger: usize },
     Goal,
+    Sandbank,
 }
 
 impl TryFrom<&Element> for Field {
@@ -18,14 +19,43 @@ impl TryFrom<&Element> for Field {
     fn try_from(elem: &Element) -> Result<Self> {
         match elem.name() {
             // TODO: Check whether the serialized names are correct
-            "water" => Ok(Field::Water),
-            "island" => Ok(Field::Island),
-            "passenger" => Ok(Field::Passenger {
+            "water" => Ok(Self::Water),
+            "island" => Ok(Self::Island),
+            "passenger" => Ok(Self::Passenger {
                 direction: elem.attribute("direction")?.parse()?,
                 passenger: elem.attribute("passenger")?.parse()?,
             }),
-            "goal" => Ok(Field::Goal),
+            "goal" => Ok(Self::Goal),
+            "sandbank" => Ok(Self::Sandbank),
             t => Err(Error::UnknownVariant(format!("Unknown field type: {}", t))),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use indoc::indoc;
+
+    use crate::{game::Field, util::Element};
+
+    #[test]
+    fn test_from_xml() {
+        assert_eq!(Field::try_from(&Element::from_str(indoc! {r#"
+            <water />
+        "#}).unwrap()).unwrap(), Field::Water);
+
+        assert_eq!(Field::try_from(&Element::from_str(indoc! {r#"
+            <island />
+        "#}).unwrap()).unwrap(), Field::Island);
+
+        assert_eq!(Field::try_from(&Element::from_str(indoc! {r#"
+            <goal />
+        "#}).unwrap()).unwrap(), Field::Goal);
+
+        assert_eq!(Field::try_from(&Element::from_str(indoc! {r#"
+            <sandbank />
+        "#}).unwrap()).unwrap(), Field::Sandbank);
     }
 }
