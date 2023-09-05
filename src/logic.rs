@@ -10,9 +10,10 @@ pub struct OwnLogic;
 impl GameClientDelegate for OwnLogic {
     fn request_move(&mut self, state: &State, _my_team: Team) -> Move {
         info!("Requested move");
-        let chosen_move = *state.possible_moves()
+        let chosen_move = state.possible_moves()
             .choose(&mut rand::thread_rng())
-            .expect("No move found!");
+            .expect("No move found!")
+            .clone();
         info!("Chose move {:?}", chosen_move);
         chosen_move
     }

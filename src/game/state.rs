@@ -31,7 +31,7 @@ impl State {
     pub fn turn(&self) -> usize { self.turn }
 
     /// Fetches the most recent move.
-    pub fn last_move(&self) -> Option<Move> { self.last_move }
+    pub fn last_move(&self) -> Option<&Move> { self.last_move.as_ref() }
 
     /// Fetches the starting team.
     pub fn start_team(&self) -> Team { self.start_team }

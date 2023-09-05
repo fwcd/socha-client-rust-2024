@@ -1,3 +1,4 @@
+mod action;
 mod board;
 mod constants;
 mod dir;
@@ -9,6 +10,7 @@ mod state;
 mod team;
 mod vec;
 
+pub use action::*;
 pub use board::*;
 pub use constants::*;
 pub use dir::*;
