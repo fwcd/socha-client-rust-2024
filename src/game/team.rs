@@ -11,6 +11,9 @@ pub enum Team {
 }
 
 impl Team {
+    /// The total number of teams.
+    pub const COUNT: usize = 2;
+
     /// The team with the given letter.
     pub fn with_letter(letter: char) -> Option<Self> {
         match letter {
