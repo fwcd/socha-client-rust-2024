@@ -194,16 +194,13 @@ impl TryFrom<&Element> for CubeVec {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
-    use indoc::indoc;
-
-    use crate::{util::Element, game::CubeVec};
+    use crate::{util::assert_xml_parses, game::CubeVec};
 
     #[test]
     fn test_from_xml() {
-        assert_eq!(CubeVec::try_from(&Element::from_str(indoc! {r#"
-            <position r="23" q="0" s="-2" />
-        "#}).unwrap()).unwrap(), CubeVec::new(23, 0, -2));
+        assert_xml_parses!(
+            r#"<position r="23" q="0" s="-2" />"#,
+            CubeVec::new(23, 0, -2)
+        );
     }
 }

@@ -90,16 +90,14 @@ impl TryFrom<&Element> for State {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
     use indoc::indoc;
 
-    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field}, util::Element};
+    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field}, util::assert_xml_parses};
 
     #[test]
     fn test_from_xml() {
         // TODO: Test the sub-structures too
-        assert_eq!(State::try_from(&Element::from_str(indoc! {r#"
+        assert_xml_parses!(indoc! {r#"
             <state startTeam="ONE" class="state" turn="0" currentTeam="ONE">
                 <board nextDirection="DOWN_RIGHT">
                     <segment direction="RIGHT">
@@ -172,7 +170,7 @@ mod tests {
                     <position r="1" s="1" q="-2" />
                 </ship>
             </state>
-        "#}).unwrap()).unwrap(), State {
+        "#}, State {
             board: Board {
                 segments: vec![
                     Segment {

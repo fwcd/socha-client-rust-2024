@@ -34,28 +34,13 @@ impl TryFrom<&Element> for Field {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
-    use indoc::indoc;
-
-    use crate::{game::Field, util::Element};
+    use crate::{util::assert_xml_parses, game::Field};
 
     #[test]
     fn test_from_xml() {
-        assert_eq!(Field::try_from(&Element::from_str(indoc! {r#"
-            <water />
-        "#}).unwrap()).unwrap(), Field::Water);
-
-        assert_eq!(Field::try_from(&Element::from_str(indoc! {r#"
-            <island />
-        "#}).unwrap()).unwrap(), Field::Island);
-
-        assert_eq!(Field::try_from(&Element::from_str(indoc! {r#"
-            <goal />
-        "#}).unwrap()).unwrap(), Field::Goal);
-
-        assert_eq!(Field::try_from(&Element::from_str(indoc! {r#"
-            <sandbank />
-        "#}).unwrap()).unwrap(), Field::Sandbank);
+        assert_xml_parses!(r#"<water />"#, Field::Water);
+        assert_xml_parses!(r#"<island />"#, Field::Island);
+        assert_xml_parses!(r#"<goal />"#, Field::Goal);
+        assert_xml_parses!(r#"<sandbank />"#, Field::Sandbank);
     }
 }
