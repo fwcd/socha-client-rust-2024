@@ -37,9 +37,7 @@ impl From<Move> for Element {
 mod tests {
     use indoc::indoc;
 
-    use crate::{util::assert_xml_format, game::{Move, CubeDir, Action}};
-
-    // TODO: Add parse and/or roundtrip tests
+    use crate::{util::{assert_xml_format, assert_xml_roundtrip}, game::{Move, CubeDir, Action}};
 
     #[test]
     fn test_to_xml() {
@@ -61,5 +59,16 @@ mod tests {
                 </data>
             "#}
         );
+    }
+
+    #[test]
+    fn test_xml_roundtrips() {
+        assert_xml_roundtrip!(Move {
+            actions: vec![
+                Action::Advance { distance: 1 },
+                Action::Turn { direction: CubeDir::DownRight },
+                Action::Turn { direction: CubeDir::Left },
+            ]
+        });
     }
 }

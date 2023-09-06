@@ -3,23 +3,21 @@ macro_rules! assert_xml_parse {
         {
             use ::std::{str::FromStr, fmt::Debug};
 
-            use crate::util::Element;
+            use crate::util::{Element, Error};
 
-            // Workaround to help type inference "see" the generic type.
-
-            fn assert_element_parses<'a, T>(element: &'a Element, expected: T)
+            /// Workaround to help type inference "see" the generic type.
+            fn _impl<T>(xml: &str, expected: T)
             where
-                T: Debug + Eq + TryFrom<&'a Element>,
-                T::Error: Debug
+                for<'a> T: Debug + Eq + TryFrom<&'a Element, Error = Error>,
             {
+                let element = Element::from_str(xml).unwrap();
                 assert_eq!(
                     T::try_from(&element).unwrap(),
                     expected
                 )
             }
 
-            let element = Element::from_str($xml).unwrap();
-            assert_element_parses(&element, $expected)
+            _impl($xml, $expected)
         }
     };
 }
@@ -39,5 +37,30 @@ macro_rules! assert_xml_format {
     };
 }
 
+macro_rules! assert_xml_roundtrip {
+    ($value:expr) => {
+        {
+            use ::std::fmt::Debug;
+
+            use crate::util::{Element, Error};
+
+            /// Workaround to help type inference "see" the generic type.
+            fn _impl<T>(value: T)
+            where
+                for<'a> T: Clone + Debug + Eq + Into<Element> + TryFrom<&'a Element, Error = Error>,
+            {
+                let element = value.clone().into();
+                assert_eq!(
+                    T::try_from(&element).unwrap(),
+                    value
+                )
+            }
+
+            _impl($value)
+        }
+    };
+}
+
 pub(crate) use assert_xml_parse;
 pub(crate) use assert_xml_format;
+pub(crate) use assert_xml_roundtrip;
