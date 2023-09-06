@@ -37,7 +37,7 @@ mod tests {
     use crate::{util::assert_xml_parse, game::Field};
 
     #[test]
-    fn test_from_xml() {
+    fn test_xml_parses() {
         assert_xml_parse!(r#"<water />"#, Field::Water);
         assert_xml_parse!(r#"<island />"#, Field::Island);
         assert_xml_parse!(r#"<goal />"#, Field::Goal);

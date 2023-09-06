@@ -39,7 +39,7 @@ mod tests {
     use crate::{util::Element, protocol::Player, game::Team};
 
     #[test]
-    fn test_from_xml() {
+    fn test_xml_parses() {
         assert_eq!(Player::try_from(&Element::from_str(indoc! {r#"
             <player name="Alice" team="ONE" />
         "#}).unwrap()).unwrap(), Player::new(Some("Alice"), Team::One));

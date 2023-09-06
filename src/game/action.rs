@@ -69,7 +69,7 @@ mod tests {
     // TODO: Add parse and/or roundtrip tests
 
     #[test]
-    fn test_to_xml() {
+    fn test_xml_formats() {
         assert_xml_format!(
             Action::Accelerate { acc: -2 },
             r#"<acceleration acc="-2" />"#

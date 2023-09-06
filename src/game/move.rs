@@ -40,7 +40,7 @@ mod tests {
     use crate::{util::{assert_xml_format, assert_xml_roundtrip}, game::{Move, CubeDir, Action}};
 
     #[test]
-    fn test_to_xml() {
+    fn test_xml_formats() {
         assert_xml_format!(
             Move {
                 actions: vec![

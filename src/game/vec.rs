@@ -197,7 +197,7 @@ mod tests {
     use crate::{util::assert_xml_parse, game::CubeVec};
 
     #[test]
-    fn test_from_xml() {
+    fn test_xml_parses() {
         assert_xml_parse!(
             r#"<position r="23" q="0" s="-2" />"#,
             CubeVec::new(23, 0, -2)

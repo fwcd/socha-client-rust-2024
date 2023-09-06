@@ -46,7 +46,7 @@ mod tests {
     use crate::{util::Element, protocol::{Score, ScoreCause}};
 
     #[test]
-    fn test_from_xml() {
+    fn test_xml_parses() {
         assert_eq!(Score::try_from(&Element::from_str(indoc! {r#"
             <score cause="LEFT" reason="Player left">
                 <part>0</part>

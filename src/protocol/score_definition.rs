@@ -35,7 +35,7 @@ mod tests {
     use crate::{util::Element, protocol::{ScoreDefinition, ScoreDefinitionFragment, ScoreAggregation}};
 
     #[test]
-    fn test_from_xml() {
+    fn test_xml_parses() {
         assert_eq!(ScoreDefinition::try_from(&Element::from_str(indoc! {r#"
             <definition>
                 <fragment name="Siegpunkte">

@@ -36,7 +36,7 @@ mod tests {
     use crate::{game::{Segment, CubeDir, CubeVec, Field}, util::Element};
 
     #[test]
-    fn test_from_xml() {
+    fn test_xml_parses() {
         assert_eq!(Segment::try_from(&Element::from_str(indoc! {r#"
             <segment direction="RIGHT">
                 <center q="0" r="0" s="0" />

@@ -95,7 +95,7 @@ mod tests {
     use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field}, util::assert_xml_parse};
 
     #[test]
-    fn test_from_xml() {
+    fn test_xml_parses() {
         // TODO: Test the sub-structures too
         assert_xml_parse!(indoc! {r#"
             <state startTeam="ONE" class="state" turn="0" currentTeam="ONE">
