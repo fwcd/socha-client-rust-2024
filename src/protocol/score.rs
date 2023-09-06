@@ -39,19 +39,17 @@ impl TryFrom<&Element> for Score {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
     use indoc::indoc;
 
-    use crate::{util::Element, protocol::{Score, ScoreCause}};
+    use crate::{util::assert_xml_parse, protocol::{Score, ScoreCause}};
 
     #[test]
     fn test_xml_parses() {
-        assert_eq!(Score::try_from(&Element::from_str(indoc! {r#"
+        assert_xml_parse!(indoc! {r#"
             <score cause="LEFT" reason="Player left">
                 <part>0</part>
                 <part>15</part>
             </score>
-        "#}).unwrap()).unwrap(), Score::new(ScoreCause::Left, "Player left", [0, 15]));
+        "#}, Score::new(ScoreCause::Left, "Player left", [0, 15]));
     }
 }

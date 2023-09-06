@@ -32,20 +32,18 @@ impl TryFrom<&Element> for Player {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
-    use indoc::indoc;
-
-    use crate::{util::Element, protocol::Player, game::Team};
+    use crate::{util::assert_xml_parse, protocol::Player, game::Team};
 
     #[test]
     fn test_xml_parses() {
-        assert_eq!(Player::try_from(&Element::from_str(indoc! {r#"
-            <player name="Alice" team="ONE" />
-        "#}).unwrap()).unwrap(), Player::new(Some("Alice"), Team::One));
+        assert_xml_parse!(
+            r#"<player name="Alice" team="ONE" />"#,
+            Player::new(Some("Alice"), Team::One)
+        );
 
-        assert_eq!(Player::try_from(&Element::from_str(indoc! {r#"
-            <player team="TWO" />
-        "#}).unwrap()).unwrap(), Player::new(None, Team::Two));
+        assert_xml_parse!(
+            r#"<player team="TWO" />"#,
+            Player::new(None, Team::Two)
+        );
     }
 }

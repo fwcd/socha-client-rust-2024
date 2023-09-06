@@ -28,15 +28,13 @@ impl TryFrom<&Element> for ScoreDefinition {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
     use indoc::indoc;
 
-    use crate::{util::Element, protocol::{ScoreDefinition, ScoreDefinitionFragment, ScoreAggregation}};
+    use crate::{util::assert_xml_parse, protocol::{ScoreDefinition, ScoreDefinitionFragment, ScoreAggregation}};
 
     #[test]
     fn test_xml_parses() {
-        assert_eq!(ScoreDefinition::try_from(&Element::from_str(indoc! {r#"
+        assert_xml_parse!(indoc! {r#"
             <definition>
                 <fragment name="Siegpunkte">
                     <aggregation>SUM</aggregation>
@@ -47,7 +45,7 @@ mod tests {
                     <relevantForRanking>true</relevantForRanking>
                 </fragment>
             </definition>
-        "#}).unwrap()).unwrap(), ScoreDefinition::new([
+        "#}, ScoreDefinition::new([
             ScoreDefinitionFragment::new("Siegpunkte", ScoreAggregation::Sum, true),
             ScoreDefinitionFragment::new("∅ Punkte", ScoreAggregation::Average, true),
         ]));
