@@ -1,23 +1,23 @@
 mod action;
 mod board;
 mod constants;
-mod dir;
+mod cube_dir;
+mod cube_vec;
 mod field;
 mod r#move;
 mod segment;
 mod ship;
 mod state;
 mod team;
-mod vec;
 
 pub use action::*;
 pub use board::*;
 pub use constants::*;
-pub use dir::*;
+pub use cube_dir::*;
+pub use cube_vec::*;
 pub use field::*;
 pub use r#move::*;
 pub use ship::*;
 pub use segment::*;
 pub use state::*;
 pub use team::*;
-pub use vec::*;
