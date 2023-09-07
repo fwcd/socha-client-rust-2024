@@ -34,7 +34,7 @@ impl CubeDir {
         self as i32
     }
 
-    /// Clockwise turns to the target (in `(-3)..<3`).
+    /// Clockwise turns to the target (in `(-3)..3`).
     pub fn turn_count_to(self, target: Self) -> i32 {
         ((Self::COUNT as i32 + target.turns() - self.turns() + 3) % Self::COUNT as i32) - 3
     }

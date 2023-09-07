@@ -47,6 +47,10 @@ impl CubeVec {
     #[inline]
     pub fn x(self) -> i32 { self.q * 2 + self.r }
 
+    /// Alias for the r component.
+    #[inline]
+    pub fn y(self) -> i32 { self.r }
+
     /// The first component of this vector.
     #[inline]
     pub fn r(self) -> i32 { self.r }
