@@ -39,8 +39,25 @@ impl State {
     /// The next team to make a move.
     pub fn current_team(&self) -> Team { self.current_team }
 
+    /// The opposing team.
+    pub fn other_team(&self) -> Team { self.current_team.opponent() }
+
+    /// The ship for a team.
+    pub fn ship(&self, team: Team) -> Ship { self.ships[team.index()] }
+
     /// The current team's ship.
-    pub fn current_ship(&self) -> Ship { self.ships[self.current_team.index()] }
+    pub fn current_ship(&self) -> Ship { self.ship(self.current_team()) }
+
+    /// The opponent team's ship.
+    pub fn other_ship(&self) -> Ship { self.ship(self.other_team()) }
+
+    /// The ships.
+    pub fn ships(&self) -> [Ship; Team::COUNT] { self.ships }
+
+    /// Determines the team that should go first at the beginning of the round.
+    pub fn determine_ahead_team(&self) -> Team {
+        self.ships.into_iter().max_by_key(|s| (s.points, s.speed, s.coal)).unwrap().team
+    }
 
     /// Whether the game is over.
     pub fn is_over(&self) -> bool {
@@ -214,6 +231,7 @@ mod tests {
             },
             ships: [
                 Ship {
+                    team: Team::One,
                     position: CubeVec::new(-1, -1, 2),
                     direction: CubeDir::Right,
                     speed: 1,
@@ -223,6 +241,7 @@ mod tests {
                     points: 0,
                 },
                 Ship {
+                    team: Team::Two,
                     position: CubeVec::new(1, -2, 1),
                     direction: CubeDir::Right,
                     speed: 1,

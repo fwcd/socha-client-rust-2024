@@ -15,6 +15,9 @@ impl Team {
     /// The total number of teams.
     pub const COUNT: usize = 2;
 
+    /// The teams.
+    pub const ALL: [Self; Self::COUNT] = [Self::One, Self::Two];
+
     /// The team with the given letter.
     pub fn with_letter(letter: char) -> Option<Self> {
         match letter {
