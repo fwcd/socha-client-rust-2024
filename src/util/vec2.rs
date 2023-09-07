@@ -1,12 +1,12 @@
-use std::{fmt, ops::{Add, Sub, Mul, Div, DivAssign, MulAssign, AddAssign, SubAssign}};
+use std::{fmt, ops::{Add, Sub, Mul, Div, DivAssign, MulAssign, AddAssign, SubAssign, Neg}};
 
 use super::{Zero, From2};
 
 /// A 2D vector (or position).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Vec2<T> {
-    x: T,
-    y: T,
+    pub x: T,
+    pub y: T,
 }
 
 impl<T> Zero for Vec2<T> where T: Zero {
@@ -17,17 +17,9 @@ impl<T> Zero for Vec2<T> where T: Zero {
 impl<T> Vec2<T> {
     /// Creates a new vector from the given cube components.
     #[inline]
-    pub const fn new(r: T, q: T) -> Self {
-        Self { x: r, y: q }
+    pub const fn new(x: T, y: T) -> Self {
+        Self { x, y }
     }
-
-    /// The first component of this vector.
-    #[inline]
-    pub fn x(self) -> T { self.x }
-
-    /// The second component of this vector.
-    #[inline]
-    pub fn y(self) -> T { self.y }
 }
 
 impl<T> Vec2<T> where T: Add<Output = T> + Mul<Output = T> + Copy {
@@ -93,6 +85,14 @@ impl<T> DivAssign<T> for Vec2<T> where T: DivAssign + Copy {
     fn div_assign(&mut self, rhs: T) {
         self.x /= rhs;
         self.y /= rhs;
+    }
+}
+
+impl<T> Neg for Vec2<T> where T: Neg<Output = T> {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self::new(-self.x, -self.y)
     }
 }
 
