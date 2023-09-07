@@ -1,6 +1,6 @@
-use std::{fmt, ops::{Add, Sub, Mul, Div, DivAssign, MulAssign, AddAssign, SubAssign}};
+use std::{fmt, ops::{Add, Sub, Mul, Div, DivAssign, MulAssign, AddAssign, SubAssign, Neg}};
 
-use crate::util::{Element, Error, Result};
+use crate::util::{Element, Error, Result, Vec2};
 
 use super::CubeDir;
 
@@ -54,6 +54,17 @@ impl CubeVec {
     /// The third component of this vector.
     #[inline]
     pub fn s(self) -> i32 { self.s }
+
+    /// Rotates by vector by the given amount of turns to the right.
+    pub fn rotated_by(self, turns: usize) -> CubeVec {
+        let components: [i32; 3] = self.into();
+        let vec = CubeVec::new(
+            components[turns % 3],
+            components[(turns + 1) % 3],
+            components[(turns + 2) % 3],
+        );
+        if turns % 2 == 0 { vec } else { -vec }
+    }
 
     /// Fetches the 6 hex neighbors.
     pub fn hex_neighbors(self) -> [Self; 6] {
@@ -161,6 +172,14 @@ impl DivAssign<i32> for CubeVec {
     }
 }
 
+impl Neg for CubeVec {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self::new(-self.r, -self.q, -self.s)
+    }
+}
+
 impl fmt::Display for CubeVec {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {}, {})", self.r, self.q, self.s)
@@ -177,6 +196,22 @@ impl From<CubeDir> for CubeVec {
             CubeDir::UpLeft => Self::rq(0, -1),
             CubeDir::UpRight => Self::rq(1, -1),
         }
+    }
+}
+
+impl<T> From<Vec2<T>> for CubeVec where T: Into<i32> {
+    /// Converts local coordinates to cube coordinates.
+    fn from(vec: Vec2<T>) -> Self {
+        let x: i32 = vec.x.into();
+        let y: i32 = vec.y.into();
+        let r = y - 2;
+        CubeVec::rq(x - 1 - r.min(0), r)
+    }
+}
+
+impl From<CubeVec> for [i32; 3] {
+    fn from(vec: CubeVec) -> Self {
+        [vec.r, vec.q, vec.s]
     }
 }
 
