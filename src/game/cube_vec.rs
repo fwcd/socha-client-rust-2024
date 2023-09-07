@@ -43,6 +43,10 @@ impl CubeVec {
     #[inline]
     pub fn length(self) -> f32 { (self.squared_length() as f32).sqrt() }
 
+    /// The inferred x component.
+    #[inline]
+    pub fn x(self) -> i32 { self.q * 2 + self.r }
+
     /// The first component of this vector.
     #[inline]
     pub fn r(self) -> i32 { self.r }
@@ -205,7 +209,7 @@ impl<T> From<Vec2<T>> for CubeVec where T: Into<i32> {
         let x: i32 = vec.x.into();
         let y: i32 = vec.y.into();
         let r = y - 2;
-        CubeVec::rq(x - 1 - r.min(0), r)
+        CubeVec::rq(x - 1 - r.max(0), r)
     }
 }
 
