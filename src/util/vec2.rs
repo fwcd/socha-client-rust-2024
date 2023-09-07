@@ -1,6 +1,6 @@
 use std::{fmt, ops::{Add, Sub, Mul, Div, DivAssign, MulAssign, AddAssign, SubAssign}};
 
-use super::Zero;
+use super::{Zero, From2};
 
 /// A 2D vector (or position).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -99,5 +99,11 @@ impl<T> DivAssign<T> for Vec2<T> where T: DivAssign + Copy {
 impl<T> fmt::Display for Vec2<T> where T: fmt::Display {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
+impl<T, U> From2<Vec2<T>> for Vec2<U> where U: From<T> {
+    fn from2(value: Vec2<T>) -> Self {
+        Vec2::new(value.x.into(), value.y.into())
     }
 }
