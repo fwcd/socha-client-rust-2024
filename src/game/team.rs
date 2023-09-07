@@ -5,9 +5,10 @@ use crate::util::{Error, Result};
 
 /// A playing party in the game.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(usize)]
 pub enum Team {
-    One,
-    Two,
+    One = 0,
+    Two = 1,
 }
 
 impl Team {
@@ -25,10 +26,7 @@ impl Team {
 
     /// The team's index.
     pub fn index(self) -> usize {
-        match self {
-            Self::One => 0,
-            Self::Two => 1,
-        }
+        self as usize
     }
 
     /// The opponent of the given team.
