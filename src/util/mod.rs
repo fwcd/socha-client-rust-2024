@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod assert;
+mod convert;
 mod error;
 mod result;
 mod macros;
@@ -9,6 +10,7 @@ mod zero;
 
 #[cfg(test)]
 pub(crate) use assert::*;
+pub use convert::*;
 pub use error::*;
 pub use result::*;
 pub use macros::*;
