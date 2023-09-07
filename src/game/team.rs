@@ -46,14 +46,6 @@ impl Team {
         }
     }
 
-    /// The x-direction of the team on the board.
-    pub fn direction(self) -> i32 {
-        match self {
-            Self::One => 1,
-            Self::Two => -1,
-        }
-    }
-
     /// Fetches the letter associated with the team.
     pub fn letter(self) -> char {
         match self {

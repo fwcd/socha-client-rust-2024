@@ -39,6 +39,9 @@ impl State {
     /// The next team to make a move.
     pub fn current_team(&self) -> Team { self.current_team }
 
+    /// The current team's ship.
+    pub fn current_ship(&self) -> Ship { self.ships[self.current_team.index()] }
+
     /// Whether the game is over.
     pub fn is_over(&self) -> bool {
         todo!()
