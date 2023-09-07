@@ -56,12 +56,12 @@ impl CubeVec {
     pub fn s(self) -> i32 { self.s }
 
     /// Rotates by vector by the given amount of turns to the right.
-    pub fn rotated_by(self, turns: usize) -> CubeVec {
+    pub fn rotated_by(self, turns: i32) -> CubeVec {
         let components: [i32; 3] = self.into();
         let vec = CubeVec::new(
-            components[turns % 3],
-            components[(turns + 1) % 3],
-            components[(turns + 2) % 3],
+            components[turns.rem_euclid(3) as usize],
+            components[(turns + 1).rem_euclid(3) as usize],
+            components[(turns + 2).rem_euclid(3) as usize],
         );
         if turns % 2 == 0 { vec } else { -vec }
     }

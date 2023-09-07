@@ -11,6 +11,23 @@ pub struct Segment {
     pub fields: Vec<Vec<Field>>,
 }
 
+impl Segment {
+    /// The position of the segment's tip.
+    pub fn tip(&self) -> CubeVec {
+        self.center + CubeVec::from(self.direction) * (self.fields.len() as i32 / 2)
+    }
+
+    /// Converts local to global coordinates.
+    fn local_to_global(&self, coords: CubeVec) -> CubeVec {
+        coords.rotated_by(self.direction.turns()) + self.center
+    }
+
+    /// Converts global to local coordinates.
+    fn global_to_local(&self, coords: CubeVec) -> CubeVec {
+        (coords - self.center).rotated_by(-self.direction.turns())
+    }
+}
+
 impl TryFrom<&Element> for Segment {
     type Error = Error;
 
