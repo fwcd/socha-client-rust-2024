@@ -18,12 +18,12 @@ impl Segment {
     }
 
     /// Converts local to global coordinates.
-    fn local_to_global(&self, coords: CubeVec) -> CubeVec {
+    pub fn local_to_global(&self, coords: CubeVec) -> CubeVec {
         coords.rotated_by(self.direction.turns()) + self.center
     }
 
     /// Converts global to local coordinates.
-    fn global_to_local(&self, coords: CubeVec) -> CubeVec {
+    pub fn global_to_local(&self, coords: CubeVec) -> CubeVec {
         (coords - self.center).rotated_by(-self.direction.turns())
     }
 }
