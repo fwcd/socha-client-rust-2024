@@ -2,7 +2,7 @@
 
 use crate::util::{Element, Error, Result};
 
-use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir, Team};
+use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir, Team, FREE_ACC};
 
 /// A player's game piece.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -15,6 +15,8 @@ pub struct Ship {
     pub passengers: usize,
     pub free_turns: usize,
     pub points: usize,
+    pub movement: i32,
+    pub free_acc: i32,
 }
 
 impl Default for Ship {
@@ -28,16 +30,13 @@ impl Default for Ship {
             passengers: 0,
             free_turns: 1,
             points: 0,
+            movement: MIN_SPEED,
+            free_acc: FREE_ACC,
         }
     }
 }
 
 impl Ship {
-    /// The movement reach of the ship, based on the speed.
-    pub fn movement(self) -> i32 {
-        self.speed
-    }
-
     /// Accelerates the ship by the given amount.
     pub fn accelerate(&mut self, amount: i32) {
         self.speed += amount;
@@ -54,15 +53,18 @@ impl TryFrom<&Element> for Ship {
     type Error = Error;
 
     fn try_from(elem: &Element) -> Result<Self> {
+        let speed = elem.attribute("speed")?.parse()?;
         Ok(Self {
             team: elem.attribute("team")?.parse()?,
             position: elem.child_by_name("position")?.try_into()?,
             direction: elem.attribute("direction")?.parse()?,
-            speed: elem.attribute("speed")?.parse()?,
+            speed,
             coal: elem.attribute("coal")?.parse()?,
             passengers: elem.attribute("passengers")?.parse()?,
             free_turns: elem.attribute("freeTurns")?.parse()?,
             points: elem.attribute("points")?.parse()?,
+            movement: speed,
+            free_acc: FREE_ACC,
         })
     }
 }

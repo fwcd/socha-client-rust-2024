@@ -102,7 +102,7 @@ impl State {
     /// Fetches the possible push actions for the current player.
     pub fn possible_pushes(&self) -> Vec<Push> {
         let ship = self.current_ship();
-        if !self.must_push() || self.board.is_sandbank_at(ship.position) || ship.movement() < 1 {
+        if !self.must_push() || self.board.is_sandbank_at(ship.position) || ship.movement < 1 {
             return Vec::new();
         }
         self.possible_pushes_at(ship.position, ship.direction)
@@ -111,7 +111,7 @@ impl State {
     /// Fetches the possible advance actions for the current player.
     pub fn possible_advances(&self) -> Vec<Advance> {
         let ship = self.current_ship();
-        if ship.movement() < 1 || self.must_push() {
+        if ship.movement < 1 || self.must_push() {
             return Vec::new();
         }
         self.possible_advances_for(ship)
@@ -149,7 +149,7 @@ impl State {
         }
 
         let ship = self.current_ship();
-        return (1..=(max_coal as i32 + FREE_ACC))
+        return (1..=(max_coal as i32 + ship.free_acc))
             .flat_map(|i| [i, -i])
             .filter(|&i| if i > 0 { MAX_SPEED >= ship.speed + i } else { MIN_SPEED <= ship.speed - i })
             .map(Accelerate::new)
@@ -176,7 +176,7 @@ impl State {
 
     /// Checks how far of an advancement in the given direction is possible.
     fn advance_limit_for(&self, ship: Ship) -> AdvanceLimit {
-        self.advance_limit_with(ship.position, ship.direction, ship.movement())
+        self.advance_limit_with(ship.position, ship.direction, ship.movement)
     }
 
     /// Checks how far of an advancement in the given direction is possible.
@@ -330,7 +330,7 @@ impl MoveIterator {
 
     fn find_next(&mut self) {
         while let Some((state, _)) = self.queue.pop_front() {
-            if state.current_ship().movement() == 0 {
+            if state.current_ship().movement == 0 {
                 break;
             }
             self.process();
@@ -372,7 +372,7 @@ impl TryFrom<&Element> for State {
 mod tests {
     use indoc::indoc;
 
-    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field}, util::assert_xml_parse};
+    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field, FREE_ACC}, util::assert_xml_parse};
 
     #[test]
     fn test_xml_parses() {
@@ -499,6 +499,8 @@ mod tests {
                     coal: 6,
                     passengers: 0,
                     points: 0,
+                    movement: 1,
+                    free_acc: FREE_ACC,
                 },
                 Ship {
                     team: Team::Two,
@@ -509,6 +511,8 @@ mod tests {
                     coal: 6,
                     passengers: 0,
                     points: 0,
+                    movement: 1,
+                    free_acc: FREE_ACC,
                 },
             ],
             turn: 0,
