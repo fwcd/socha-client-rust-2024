@@ -6,7 +6,7 @@ use arrayvec::ArrayVec;
 
 use crate::util::{Element, Error, Result, Perform};
 
-use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, FREE_ACC, Accelerate, MIN_SPEED, Action};
+use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, Accelerate, MIN_SPEED, Action};
 
 /// The state of the game at a point in time.
 #[derive(Debug, Clone, PartialEq, Eq)]
