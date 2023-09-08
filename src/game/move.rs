@@ -44,9 +44,9 @@ mod tests {
         assert_xml_format!(
             Move {
                 actions: vec![
-                    Action::Accelerate { acc: -1 },
-                    Action::Turn { direction: CubeDir::DownRight },
-                    Action::Advance { distance: 2 },
+                    Action::accelerate(-1),
+                    Action::turn(CubeDir::DownRight),
+                    Action::advance(2),
                 ]
             },
             indoc! {r#"
@@ -65,9 +65,9 @@ mod tests {
     fn test_xml_roundtrips() {
         assert_xml_roundtrip!(Move {
             actions: vec![
-                Action::Advance { distance: 1 },
-                Action::Turn { direction: CubeDir::DownRight },
-                Action::Turn { direction: CubeDir::Left },
+                Action::advance(1),
+                Action::turn(CubeDir::DownRight),
+                Action::turn(CubeDir::Left),
             ]
         });
     }
