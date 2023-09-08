@@ -87,8 +87,8 @@ impl Board {
     }
 
     /// The effective speed of the given ship, depending on current.
-    pub fn effective_speed(&self, ship: Ship) -> usize {
-        ship.speed - (self.does_field_have_current(ship.position) as usize)
+    pub fn effective_speed(&self, ship: Ship) -> i32 {
+        ship.speed - (self.does_field_have_current(ship.position) as i32)
     }
 
     /// Picks up a passenger.

@@ -1,10 +1,12 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/GameState.kt
 
+use std::collections::VecDeque;
+
 use arrayvec::ArrayVec;
 
-use crate::util::{Element, Error, Result};
+use crate::util::{Element, Error, Result, Perform};
 
-use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, FREE_ACC, Accelerate, MIN_SPEED};
+use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, FREE_ACC, Accelerate, MIN_SPEED, Action};
 
 /// The state of the game at a point in time.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -25,24 +27,31 @@ pub struct State {
 
 impl State {
     /// Fetches the board.
+    #[inline]
     pub fn board(&self) -> &Board { &self.board }
 
     /// Fetches the turn of the game.
+    #[inline]
     pub fn turn(&self) -> usize { self.turn }
 
     /// Fetches the most recent move.
+    #[inline]
     pub fn last_move(&self) -> Option<&Move> { self.last_move.as_ref() }
 
     /// Fetches the starting team.
+    #[inline]
     pub fn start_team(&self) -> Team { self.start_team }
 
     /// The next team to make a move.
+    #[inline]
     pub fn current_team(&self) -> Team { self.current_team }
 
     /// The opposing team.
+    #[inline]
     pub fn other_team(&self) -> Team { self.current_team.opponent() }
 
     /// The ship for a team.
+    #[inline]
     pub fn ship(&self, team: Team) -> Ship { self.ships[team.index()] }
 
     /// The current team's ship.
@@ -62,6 +71,22 @@ impl State {
     /// Whether the current ship must push.
     pub fn must_push(&self) -> bool {
         self.current_ship().position == self.other_ship().position
+    }
+
+    /// Fetches the possible actions for the current player at the given rank in the move.
+    pub fn possible_actions_at(&self, rank: i32) -> Vec<Action> {
+        let mut actions: Vec<Action> = Vec::new();
+
+        if rank == 0 {
+            actions.extend(self.possible_accelerations().into_iter().map(Action::Accelerate));
+        }
+        actions.extend(self.possible_turns().into_iter().map(Action::Turn));
+        actions.extend(self.possible_advances().into_iter().map(Action::Advance));
+        if rank != 0 {
+            actions.extend(self.possible_pushes().into_iter().map(Action::Push));
+        }
+
+        actions
     }
 
     /// Fetches the possible turn actions for the current player.
@@ -124,9 +149,9 @@ impl State {
         }
 
         let ship = self.current_ship();
-        return (1..=(max_coal + FREE_ACC) as i32)
+        return (1..=(max_coal as i32 + FREE_ACC))
             .flat_map(|i| [i, -i])
-            .filter(|&i| if i > 0 { MAX_SPEED >= (ship.speed as i32 + i) as usize } else { MIN_SPEED <= (ship.speed as i32 - i) as usize })
+            .filter(|&i| if i > 0 { MAX_SPEED >= ship.speed + i } else { MIN_SPEED <= ship.speed - i })
             .map(Accelerate::new)
             .collect()
     }
@@ -155,12 +180,12 @@ impl State {
     }
 
     /// Checks how far of an advancement in the given direction is possible.
-    fn advance_limit_with(&self, start: CubeVec, dir: CubeDir, max_movement: usize) -> AdvanceLimit {
+    fn advance_limit_with(&self, start: CubeVec, dir: CubeDir, max_movement: i32) -> AdvanceLimit {
         let mut current_pos = start;
         let mut total_cost = 0;
         let mut has_current = false;
         let max_movement = max_movement.min(MAX_SPEED);
-        let mut costs = Vec::with_capacity(max_movement);
+        let mut costs = Vec::new();
 
         macro_rules! result {
             ($problem:expr) => {
@@ -215,26 +240,30 @@ impl State {
     }
 
     /// Fetches the possible moves.
-    pub fn possible_moves(&self) -> Vec<Move> {
+    pub fn possible_moves(&self) -> MoveIterator {
+        let mut queue = VecDeque::new();
+        queue.push_back((self.clone(), Move::new()));
+        MoveIterator { queue }
+    }
+}
+
+impl Perform<Action> for State {
+    /// Performs the given action.
+    fn perform(&mut self, action: Action) {
         todo!()
     }
+}
 
+impl Perform<Move> for State {
     /// Performs the given move.
-    pub fn perform(&mut self, m: Move) {
+    fn perform(&mut self, m: Move) {
         todo!()
-    }
-
-    /// Fetches the state after the given move.
-    pub fn child(&self, m: Move) -> Self {
-        let mut next = self.clone();
-        next.perform(m);
-        next
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct AdvanceLimit {
-    costs: Vec<usize>,
+    costs: Vec<i32>,
     problem: AdvanceProblem,
 }
 
@@ -245,6 +274,76 @@ impl AdvanceLimit {
 
     pub fn advances(&self) -> impl Iterator<Item = Advance> {
         (1..=self.distance()).rev().map(|d| Advance::new(d as i32))
+    }
+}
+
+pub struct MoveIterator {
+    queue: VecDeque<(State, Move)>,
+}
+
+impl MoveIterator {
+    fn process(&mut self) -> Option<Move> {
+        if let Some((state, current_move)) = self.queue.pop_front() {
+            if !matches!(current_move.last(), Some(Action::Advance(_))) {
+                for adv in state.possible_advances() {
+                    let adv = Action::Advance(adv);
+                    let child_state = state.child(adv);
+                    let child_move = current_move.child(adv);
+                    let pushes = child_state.possible_pushes();
+                    if pushes.is_empty() {
+                        self.queue.push_back((child_state, child_move));
+                    } else {
+                        for push in pushes {
+                            let push = Action::Push(push);
+                            self.queue.push_back((child_state.child(push), child_move.child(push)));
+                        }
+                    }
+                }
+            }
+
+            if !matches!(current_move.last(), Some(Action::Turn(_))) {
+                for turn in state.possible_turns() {
+                    let turn = Action::Turn(turn);
+                    self.queue.push_back((state.child(turn), current_move.child(turn)));
+                }
+            }
+
+            if current_move.is_empty() {
+                for acc in state.possible_accelerations() {
+                    let mut new_state = state.clone();
+                    new_state.ships = state.ships.map(|s| {
+                        if s.team == state.current_team() {
+                            s.child(acc)
+                        } else {
+                            s
+                        }
+                    });
+                    self.queue.push_back((new_state, Move::from(Action::Accelerate(acc))))
+                }
+            }
+
+            Some(current_move)
+        } else {
+            None
+        }
+    }
+
+    fn find_next(&mut self) {
+        while let Some((state, _)) = self.queue.pop_front() {
+            if state.current_ship().movement() == 0 {
+                break;
+            }
+            self.process();
+        }
+    }
+}
+
+impl Iterator for MoveIterator {
+    type Item = Move;
+
+    fn next(&mut self) -> Option<Move> {
+        self.find_next();
+        self.process()
     }
 }
 

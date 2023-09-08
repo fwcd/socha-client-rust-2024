@@ -1,8 +1,8 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/Ship.kt
 
-use crate::util::{Element, Error, Result};
+use crate::util::{Element, Error, Result, Perform};
 
-use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir, Team};
+use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir, Team, Accelerate};
 
 /// A player's game piece.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -10,7 +10,7 @@ pub struct Ship {
     pub team: Team,
     pub position: CubeVec,
     pub direction: CubeDir,
-    pub speed: usize,
+    pub speed: i32,
     pub coal: usize,
     pub passengers: usize,
     pub free_turns: usize,
@@ -34,8 +34,15 @@ impl Default for Ship {
 
 impl Ship {
     /// The movement reach of the ship, based on the speed.
-    pub fn movement(self) -> usize {
+    pub fn movement(self) -> i32 {
         self.speed
+    }
+}
+
+impl Perform<Accelerate> for Ship {
+    /// Accelerates the ship.
+    fn perform(&mut self, acc: Accelerate) {
+        self.speed += acc.acc;
     }
 }
 
