@@ -1,5 +1,4 @@
 use log::{info, debug};
-use rand::seq::SliceRandom;
 
 use socha_client_2024::{client::GameClientDelegate, game::{Move, Team, State}};
 
@@ -11,9 +10,8 @@ impl GameClientDelegate for OwnLogic {
     fn request_move(&mut self, state: &State, _my_team: Team) -> Move {
         info!("Requested move");
         let chosen_move = state.possible_moves()
-            .choose(&mut rand::thread_rng())
-            .expect("No move found!")
-            .clone();
+            .next()
+            .expect("No move found!");
         info!("Chose move {:?}", chosen_move);
         chosen_move
     }
