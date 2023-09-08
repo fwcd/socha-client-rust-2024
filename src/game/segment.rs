@@ -53,7 +53,7 @@ impl Segment {
 
     /// Fetches the array indices for the given local position.
     fn array_coords(coords: CubeVec) -> (usize, usize) {
-        (coords.q().max(-coords.s()) as usize + 1, coords.r() as usize + 2)
+        ((coords.q().max(-coords.s()) + 1) as usize, (coords.r() + 2) as usize)
     }
 }
 
