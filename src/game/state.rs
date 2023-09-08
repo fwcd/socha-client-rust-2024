@@ -407,7 +407,7 @@ impl MoveIterator {
     }
 
     fn find_next(&mut self) {
-        while let Some((state, _)) = self.queue.pop_front() {
+        while let Some((state, _)) = self.queue.front() {
             if state.current_ship().movement == 0 {
                 break;
             }
