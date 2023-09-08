@@ -34,7 +34,7 @@ impl Action {
     }
 
     /// Creates an advancement action.
-    pub fn advance(distance: usize) -> Self {
+    pub fn advance(distance: i32) -> Self {
         Self::Advance(Advance { distance })
     }
 

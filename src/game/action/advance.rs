@@ -4,12 +4,12 @@ use crate::util::{Element, Error, Result};
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Advance {
     /// The number of fields to move.
-    pub distance: usize,
+    pub distance: i32,
 }
 
 impl Advance {
     /// Creates a new advancement with the given distance.
-    pub fn new(distance: usize) -> Self {
+    pub fn new(distance: i32) -> Self {
         Self { distance }
     }
 }

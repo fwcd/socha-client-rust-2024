@@ -43,6 +43,11 @@ impl CubeDir {
     pub fn rotated_by(self, turns: i32) -> Self {
         Self::ALL[(self.turns() + turns).rem_euclid(Self::COUNT as i32) as usize]
     }
+
+    /// The opposite direction if the given condition is satisfied.
+    pub fn opposite_if(self, condition: bool) -> Self {
+        if condition { -self } else { self }
+    }
 }
 
 impl Neg for CubeDir {

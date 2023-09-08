@@ -1,10 +1,12 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/GameState.kt
 
+use std::thread::current;
+
 use arrayvec::ArrayVec;
 
 use crate::util::{Element, Error, Result};
 
-use super::{Board, Move, Team, Ship, Turn, Field, CubeVec, CubeDir, Push};
+use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field};
 
 /// The state of the game at a point in time.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -102,6 +104,79 @@ impl State {
             .collect()
     }
 
+    /// Fetches the possible advance actions for the given ship.
+    fn possible_advances_for(&self, ship: Ship) -> Vec<Advance> {
+        self.sandbank_advances_for(ship)
+            .unwrap_or_else(|| self.advance_limit_for(ship).advances().collect())
+    }
+
+    /// Fetches the possible advances for a ship on a sandbank.
+    fn sandbank_advances_for(&self, ship: Ship) -> Option<Vec<Advance>> {
+        if self.board.is_sandbank_at(ship.position) {
+            Some([-1, 1].into_iter()
+                .map(Advance::new)
+                .filter(|a| self.advance_limit_with(ship.position, ship.direction.opposite_if(a.distance < 0), 1).distance() > 1)
+                .collect())
+        } else {
+            None
+        }
+    }
+
+    /// Checks how far of an advancement in the given direction is possible.
+    fn advance_limit_for(&self, ship: Ship) -> AdvanceLimit {
+        self.advance_limit_with(ship.position, ship.direction, ship.movement())
+    }
+
+    /// Checks how far of an advancement in the given direction is possible.
+    fn advance_limit_with(&self, start: CubeVec, dir: CubeDir, max_movement: usize) -> AdvanceLimit {
+        let mut current_pos = start;
+        let mut total_cost = 0;
+        let mut has_current = false;
+        let max_movement = max_movement.min(MAX_SPEED);
+        let mut costs = Vec::with_capacity(max_movement);
+
+        macro_rules! result {
+            ($problem:expr) => {
+                AdvanceLimit { costs, problem: $problem }
+            };
+        }
+
+        while total_cost < max_movement {
+            current_pos += dir;
+            total_cost += 1;
+
+            if !self.board.is_empty_at(current_pos) {
+                return result!(AdvanceProblem::FieldIsBlocked);
+            }
+
+            let current_field = self.board[current_pos];
+            if !has_current && self.board.does_field_have_current(current_pos) {
+                has_current = true;
+                if total_cost < max_movement {
+                    total_cost += 1;
+                } else {
+                    break;
+                }
+            }
+
+            if self.ships.iter().any(|s| s.position == current_pos) {
+                if total_cost < max_movement {
+                    costs.push(total_cost);
+                    return result!(AdvanceProblem::ShipAlreadyInTarget);
+                }
+                return result!(AdvanceProblem::InsufficientPush);
+            }
+
+            if let Field::Sandbank = current_field {
+                return result!(AdvanceProblem::MoveEndOnSandbank);
+            }
+
+            costs.push(total_cost);
+        }
+
+        result!(AdvanceProblem::MovementPointsMissing)
+    }
+
     /// Whether the game is over.
     pub fn is_over(&self) -> bool {
         todo!()
@@ -127,6 +202,22 @@ impl State {
         let mut next = self.clone();
         next.perform(m);
         next
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+struct AdvanceLimit {
+    costs: Vec<usize>,
+    problem: AdvanceProblem,
+}
+
+impl AdvanceLimit {
+    pub fn distance(&self) -> usize {
+        self.costs.len()
+    }
+
+    pub fn advances(&self) -> impl Iterator<Item = Advance> {
+        (1..=self.distance()).rev().map(|d| Advance::new(d as i32))
     }
 }
 
