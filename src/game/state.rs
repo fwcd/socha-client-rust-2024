@@ -69,6 +69,11 @@ impl State {
         self.possible_turns_with(self.current_ship().coal)
     }
 
+    /// Fetches the possible accelerations for the current player.
+    pub fn possible_accelerations(&self) -> Vec<Accelerate> {
+        self.possible_accelerations_with(self.current_ship().coal)
+    }
+
     /// Fetches the possible push actions for the current player.
     pub fn possible_pushes(&self) -> Vec<Push> {
         let ship = self.current_ship();
@@ -76,6 +81,15 @@ impl State {
             return Vec::new();
         }
         self.possible_pushes_at(ship.position, ship.direction)
+    }
+
+    /// Fetches the possible advance actions for the current player.
+    pub fn possible_advances(&self) -> Vec<Advance> {
+        let ship = self.current_ship();
+        if ship.movement() < 1 || self.must_push() {
+            return Vec::new();
+        }
+        self.possible_advances_for(ship)
     }
 
     /// Fetches the possible turn actions for the current player consuming
