@@ -4,6 +4,8 @@ use crate::util::{Element, Error, Result, Vec2};
 
 use super::CubeDir;
 
+// TODO: Investigate using marker types to enforce global/local coordinates
+
 /// A cube coordinate vector (or position).
 /// (see https://www.redblobgames.com/grids/hexagons/#coordinates-cube).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -26,6 +26,17 @@ impl Segment {
     pub fn global_to_local(&self, coords: CubeVec) -> CubeVec {
         (coords - self.center).rotated_by(-self.direction.turns())
     }
+
+    /// Fetches the field at the given global position.
+    pub fn get_global(&self, coords: CubeVec) -> Option<&Field> {
+        self.get_local(self.global_to_local(coords))
+    }
+
+    /// Fetches the field at the given local position.
+    pub fn get_local(&self, coords: CubeVec) -> Option<&Field> {
+        let array_x = coords.q().max(-coords.s()) as usize;
+        self.fields.get(array_x + 1).and_then(|c| c.get(coords.r() as usize + 2))
+    }
 }
 
 impl TryFrom<&Element> for Segment {

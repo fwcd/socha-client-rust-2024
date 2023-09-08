@@ -4,7 +4,7 @@ use std::ops::Range;
 
 use crate::util::{Element, Error, Result, Vec2};
 
-use super::{CubeDir, Segment};
+use super::{CubeDir, Segment, CubeVec, Field};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Board {
@@ -31,6 +31,13 @@ impl Board {
         let x = xs.end - xs.start;
         let y = ys.end - ys.start;
         Vec2::new(x, y)
+    }
+
+    /// Fetches the field at the given position.
+    pub fn get(&self, coords: CubeVec) -> Option<&Field> {
+        self.segments.iter()
+            .find(|s| (s.center - coords).length() <= 3.0)
+            .and_then(|s| s.get_global(coords))
     }
 }
 
