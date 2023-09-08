@@ -1,12 +1,10 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/GameState.kt
 
-use std::thread::current;
-
 use arrayvec::ArrayVec;
 
 use crate::util::{Element, Error, Result};
 
-use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field};
+use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, FREE_ACC, Accelerate, MIN_SPEED};
 
 /// The state of the game at a point in time.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -101,6 +99,21 @@ impl State {
         CubeDir::ALL.into_iter()
             .filter(|&d| d != -incoming_dir && self.board.is_empty_at(position + d))
             .map(Push::new)
+            .collect()
+    }
+
+    /// Fetches the possible accelerations for the current player with the given
+    /// amount of coal.
+    fn possible_accelerations_with(&self, max_coal: usize) -> Vec<Accelerate> {
+        if self.must_push() {
+            return Vec::new();
+        }
+
+        let ship = self.current_ship();
+        return (1..=(max_coal + FREE_ACC) as i32)
+            .flat_map(|i| [i, -i])
+            .filter(|&i| if i > 0 { MAX_SPEED >= (ship.speed as i32 + i) as usize } else { MIN_SPEED <= (ship.speed as i32 - i) as usize })
+            .map(Accelerate::new)
             .collect()
     }
 
