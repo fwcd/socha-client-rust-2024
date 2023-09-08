@@ -43,6 +43,14 @@ impl Move {
     }
 }
 
+impl<T> Perform<Move> for T where T: Perform<Action> {
+    fn perform(&mut self, m: Move) {
+        for action in m.actions {
+            self.perform(action);
+        }
+    }
+}
+
 impl From<Action> for Move {
     fn from(action: Action) -> Self {
         Self { actions: vec![action] }

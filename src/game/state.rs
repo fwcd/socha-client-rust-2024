@@ -247,17 +247,39 @@ impl State {
     }
 }
 
-impl Perform<Action> for State {
-    /// Performs the given action.
-    fn perform(&mut self, action: Action) {
+impl Perform<Accelerate> for State {
+    fn perform(&mut self, acc: Accelerate) {
         todo!()
     }
 }
 
-impl Perform<Move> for State {
-    /// Performs the given move.
-    fn perform(&mut self, m: Move) {
+impl Perform<Advance> for State {
+    fn perform(&mut self, adv: Advance) {
         todo!()
+    }
+}
+
+impl Perform<Push> for State {
+    fn perform(&mut self, push: Push) {
+        todo!()
+    }
+}
+
+impl Perform<Turn> for State {
+    fn perform(&mut self, turn: Turn) {
+        todo!()
+    }
+}
+
+impl Perform<Action> for State {
+    /// Performs the given action.
+    fn perform(&mut self, action: Action) {
+        match action {
+            Action::Accelerate(acc) => self.perform(acc),
+            Action::Advance(adv) => self.perform(adv),
+            Action::Push(push) => self.perform(push),
+            Action::Turn(turn) => self.perform(turn),
+        }
     }
 }
 
@@ -286,16 +308,14 @@ impl MoveIterator {
         if let Some((state, current_move)) = self.queue.pop_front() {
             if !matches!(current_move.last(), Some(Action::Advance(_))) {
                 for adv in state.possible_advances() {
-                    let adv = Action::Advance(adv);
                     let child_state = state.child(adv);
-                    let child_move = current_move.child(adv);
+                    let child_move = current_move.child(Action::Advance(adv));
                     let pushes = child_state.possible_pushes();
                     if pushes.is_empty() {
                         self.queue.push_back((child_state, child_move));
                     } else {
                         for push in pushes {
-                            let push = Action::Push(push);
-                            self.queue.push_back((child_state.child(push), child_move.child(push)));
+                            self.queue.push_back((child_state.child(push), child_move.child(Action::Push(push))));
                         }
                     }
                 }
@@ -303,8 +323,7 @@ impl MoveIterator {
 
             if !matches!(current_move.last(), Some(Action::Turn(_))) {
                 for turn in state.possible_turns() {
-                    let turn = Action::Turn(turn);
-                    self.queue.push_back((state.child(turn), current_move.child(turn)));
+                    self.queue.push_back((state.child(turn), current_move.child(Action::Turn(turn))));
                 }
             }
 
