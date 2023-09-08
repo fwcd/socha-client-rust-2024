@@ -80,6 +80,29 @@ impl Board {
         ship.speed - (self.does_field_have_current(ship.position) as usize)
     }
 
+    /// Picks up a passenger.
+    pub fn pick_up_passenger(&mut self, ship: &mut Ship) -> bool {
+        if self.effective_speed(*ship) < 2 && self.remove_passenger_at(ship.position) {
+            ship.passengers += 1;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Removes a passenger at the given position.
+    fn remove_passenger_at(&mut self, coords: CubeVec) -> bool {
+        for d in CubeDir::ALL {
+            if let Some(Field::Passenger { direction, passenger }) = self.get_mut(coords) {
+                if *passenger > 0 && *direction == -d {
+                    *passenger -= 1;
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     /// Fetches the segment containing the given coordinates.
     pub fn segment_at(&self, coords: CubeVec) -> Option<&Segment> {
         self.segment_with_index_at(coords).map(|(_, s)| s)

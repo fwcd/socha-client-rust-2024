@@ -1,4 +1,4 @@
-use std::{str::FromStr, fmt};
+use std::{str::FromStr, fmt, ops::Neg};
 
 use crate::util::{Error, Result};
 
@@ -37,6 +37,21 @@ impl CubeDir {
     /// Clockwise turns to the target (in `(-3)..3`).
     pub fn turn_count_to(self, target: Self) -> i32 {
         ((Self::COUNT as i32 + target.turns() - self.turns() + 3) % Self::COUNT as i32) - 3
+    }
+}
+
+impl Neg for CubeDir {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        match self {
+            Self::Right => Self::Left,
+            Self::DownRight => Self::UpLeft,
+            Self::DownLeft => Self::UpRight,
+            Self::Left => Self::Right,
+            Self::UpLeft => Self::DownRight,
+            Self::UpRight => Self::DownLeft,
+        }
     }
 }
 
