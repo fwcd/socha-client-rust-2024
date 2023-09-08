@@ -1,8 +1,8 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/Ship.kt
 
-use crate::util::{Element, Error, Result};
+use crate::util::{Element, Error, Result, Perform};
 
-use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir, Team, FREE_ACC};
+use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir, Team, FREE_ACC, Accelerate, Advance};
 
 /// A player's game piece.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,6 +46,19 @@ impl Ship {
     pub fn accelerated(mut self, amount: i32) -> Self {
         self.accelerate(amount);
         self
+    }
+}
+
+impl Perform<Accelerate> for Ship {
+    fn perform(&mut self, acc: Accelerate) {
+        let used_coal = acc.acc.abs() - self.free_acc;
+        if used_coal > 0 {
+            self.coal -= used_coal as usize;
+            self.free_acc = 0;
+        } else {
+            self.free_acc = used_coal.abs();
+        }
+        self.accelerate(acc.acc);
     }
 }
 

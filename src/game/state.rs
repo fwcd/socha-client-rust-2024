@@ -54,11 +54,21 @@ impl State {
     #[inline]
     pub fn ship(&self, team: Team) -> Ship { self.ships[team.index()] }
 
+    /// The mutable ship for a team.
+    #[inline]
+    pub fn ship_mut(&mut self, team: Team) -> &mut Ship { &mut self.ships[team.index()] }
+
     /// The current team's ship.
     pub fn current_ship(&self) -> Ship { self.ship(self.current_team()) }
 
+    /// The current team's ship, mutably.
+    pub fn current_ship_mut(&mut self) -> &mut Ship { self.ship_mut(self.current_team()) }
+
     /// The opponent team's ship.
     pub fn other_ship(&self) -> Ship { self.ship(self.other_team()) }
+
+    /// The opponent team's ship, mutably.
+    pub fn other_ship_mut(&mut self) -> &mut Ship { self.ship_mut(self.other_team()) }
 
     /// The ships.
     pub fn ships(&self) -> [Ship; Team::COUNT] { self.ships }
@@ -249,25 +259,70 @@ impl State {
 
 impl Perform<Accelerate> for State {
     fn perform(&mut self, acc: Accelerate) {
-        todo!()
+        // TODO: Add error handling to the `Perform` trait, return `Result<(), AccelerateProblem>` and implement checks
+        // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Accelerate.kt#L41C22-L41C22
+
+        self.current_ship().perform(acc)
     }
 }
 
 impl Perform<Advance> for State {
     fn perform(&mut self, adv: Advance) {
-        todo!()
+        // TODO: Add error handling to the `Perform` trait, return `Result<(), AdvancementProblem>` and implement checks
+        // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Advance.kt
+
+        let limit = self.advance_limit_with(
+            self.current_ship().position,
+            self.current_ship().direction.opposite_if(adv.distance < 0),
+            self.current_ship().movement
+        );
+        let ship = self.current_ship_mut();
+        ship.position += CubeVec::from(ship.direction) * adv.distance;
+        ship.movement -= limit.cost_until(adv.distance);
     }
 }
 
 impl Perform<Push> for State {
     fn perform(&mut self, push: Push) {
-        todo!()
+        // TODO: Add error handling to the `Perform` trait, return `Result<(), PushProblem>` and implement checks
+        // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Push.kt
+        let team = self.current_team();
+        let nudged_team = self.other_team();
+
+        self.ship_mut(team).movement -= 1;
+
+        let push_from = self.ship(team).position;
+        let push_to = push_from + push.direction;
+        let is_sandbank = self.board.is_sandbank_at(push_to);
+
+        let nudged_ship = self.ship_mut(nudged_team);
+
+        if is_sandbank {
+            nudged_ship.speed = 1;
+            nudged_ship.movement = 1;
+        }
+
+        nudged_ship.position = push_to;
+        nudged_ship.free_turns += 1;
     }
 }
 
 impl Perform<Turn> for State {
     fn perform(&mut self, turn: Turn) {
-        todo!()
+        // TODO: Add error handling to the `Perform` trait, return `Result<(), TurnProblem>` and implement checks
+        // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Turn.kt
+
+        let turn_count = self.current_ship().direction.turn_count_to(turn.direction);
+        let abs_turn_count = turn_count.abs();
+        let free_turns = self.current_ship().free_turns as i32;
+        let used_coal = abs_turn_count - free_turns;
+
+        self.current_ship_mut().free_turns = (free_turns - abs_turn_count).max(0) as usize;
+        if used_coal > 0 {
+            self.current_ship_mut().coal -= used_coal as usize;
+        }
+
+        self.current_ship_mut().direction = turn.direction;
     }
 }
 
@@ -290,6 +345,10 @@ struct AdvanceLimit {
 }
 
 impl AdvanceLimit {
+    pub fn cost_until(&self, distance: i32) -> i32 {
+        self.costs[distance as usize - 1]
+    }
+
     pub fn distance(&self) -> usize {
         self.costs.len()
     }
