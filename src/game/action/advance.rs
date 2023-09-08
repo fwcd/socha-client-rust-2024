@@ -7,6 +7,13 @@ pub struct Advance {
     pub distance: usize,
 }
 
+impl Advance {
+    /// Creates a new advancement with the given distance.
+    pub fn new(distance: usize) -> Self {
+        Self { distance }
+    }
+}
+
 impl TryFrom<&Element> for Advance {
     type Error = Error;
 

@@ -4,13 +4,20 @@ use crate::util::{Error, Result, Element};
 
 use super::CubeDir;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Field {
     Water,
     Island,
     Passenger { direction: CubeDir, passenger: usize },
     Goal,
     Sandbank,
+}
+
+impl Field {
+    /// Whether the field is empty.
+    pub fn is_empty(self) -> bool {
+        !matches!(self, Self::Island | Self::Passenger { .. })
+    }
 }
 
 impl TryFrom<&Element> for Field {

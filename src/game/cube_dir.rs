@@ -38,6 +38,11 @@ impl CubeDir {
     pub fn turn_count_to(self, target: Self) -> i32 {
         ((Self::COUNT as i32 + target.turns() - self.turns() + 3) % Self::COUNT as i32) - 3
     }
+
+    /// Rotates the direction by the given number of turns.
+    pub fn rotated_by(self, turns: i32) -> Self {
+        Self::ALL[(self.turns() + turns).rem_euclid(Self::COUNT as i32) as usize]
+    }
 }
 
 impl Neg for CubeDir {

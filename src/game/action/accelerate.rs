@@ -7,6 +7,13 @@ pub struct Accelerate {
     pub acc: i32,
 }
 
+impl Accelerate {
+    /// Creates a new acceleration with the given amount to accelerate by.
+    pub fn new(acc: i32) -> Self {
+        Self { acc }
+    }
+}
+
 impl TryFrom<&Element> for Accelerate {
     type Error = Error;
 

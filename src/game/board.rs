@@ -33,6 +33,17 @@ impl Board {
         Vec2::new(x, y)
     }
 
+    /// Whether there is an empty field at the given position.
+    /// Note that this is also `false` for out-of-bounds fields.
+    pub fn is_empty_at(&self, coords: CubeVec) -> bool {
+        self.get(coords).map(|f| f.is_empty()).unwrap_or(false)
+    }
+
+    /// Whether there is a sandbank at the given position.
+    pub fn is_sandbank_at(&self, coords: CubeVec) -> bool {
+        matches!(self.get(coords), Some(Field::Sandbank))
+    }
+
     /// Fetches the field at the given position.
     pub fn get(&self, coords: CubeVec) -> Option<&Field> {
         self.segments.iter()

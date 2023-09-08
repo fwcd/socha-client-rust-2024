@@ -32,6 +32,13 @@ impl Default for Ship {
     }
 }
 
+impl Ship {
+    /// The movement reach of the ship, based on the speed.
+    pub fn movement(self) -> usize {
+        self.speed
+    }
+}
+
 impl TryFrom<&Element> for Ship {
     type Error = Error;
 

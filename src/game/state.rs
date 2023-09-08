@@ -4,7 +4,7 @@ use arrayvec::ArrayVec;
 
 use crate::util::{Element, Error, Result};
 
-use super::{Board, Move, Team, Ship};
+use super::{Board, Move, Team, Ship, Turn, Field, CubeVec, CubeDir, Push};
 
 /// The state of the game at a point in time.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -57,6 +57,49 @@ impl State {
     /// Determines the team that should go first at the beginning of the round.
     pub fn determine_ahead_team(&self) -> Team {
         self.ships.into_iter().max_by_key(|s| (s.points, s.speed, s.coal)).unwrap().team
+    }
+
+    /// Whether the current ship must push.
+    pub fn must_push(&self) -> bool {
+        self.current_ship().position == self.other_ship().position
+    }
+
+    /// Fetches the possible turn actions for the current player.
+    pub fn possible_turns(&self) -> Vec<Turn> {
+        self.possible_turns_with(self.current_ship().coal)
+    }
+
+    /// Fetches the possible push actions for the current player.
+    pub fn possible_pushes(&self) -> Vec<Push> {
+        let ship = self.current_ship();
+        if !self.must_push() || self.board.is_sandbank_at(ship.position) || ship.movement() < 1 {
+            return Vec::new();
+        }
+        self.possible_pushes_at(ship.position, ship.direction)
+    }
+
+    /// Fetches the possible turn actions for the current player consuming
+    /// at most the specified number of coal units.
+    fn possible_turns_with(&self, max_coal: usize) -> Vec<Turn> {
+        let ship = self.current_ship();
+        if self.must_push() || self.board.is_sandbank_at(ship.position) {
+            return Vec::new();
+        }
+        let max_turn_count = (max_coal + ship.free_turns).min(3) as i32;
+        (1..=max_turn_count)
+            .flat_map(|i| [i, -i])
+            .map(|turns| Turn::new(ship.direction.rotated_by(turns)))
+            .take(5)
+            .collect()
+    }
+
+    /// Fetches the possible push actions at the given position
+    /// with the given incoming direction.
+    fn possible_pushes_at(&self, position: CubeVec, incoming_dir: CubeDir) -> Vec<Push> {
+        CubeDir::ALL.into_iter()
+            .filter(|&d| d != -incoming_dir && self.board.is_empty_at(position + d))
+            .map(Push::new)
+            .collect()
     }
 
     /// Whether the game is over.

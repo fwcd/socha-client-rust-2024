@@ -7,6 +7,13 @@ pub struct Push {
     pub direction: CubeDir,
 }
 
+impl Push {
+    /// Creates a new push with the given direction.
+    pub fn new(direction: CubeDir) -> Self {
+        Self { direction }
+    }
+}
+
 impl TryFrom<&Element> for Push {
     type Error = Error;
 

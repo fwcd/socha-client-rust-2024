@@ -7,6 +7,13 @@ pub struct Turn {
     pub direction: CubeDir,
 }
 
+impl Turn {
+    /// Creates a new turn with the given direction.
+    pub fn new(direction: CubeDir) -> Self {
+        Self { direction }
+    }
+}
+
 impl TryFrom<&Element> for Turn {
     type Error = Error;
 
