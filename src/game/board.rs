@@ -39,6 +39,36 @@ impl Board {
             .find(|s| (s.center - coords).length() <= 3.0)
             .and_then(|s| s.get_global(coords))
     }
+
+    /// Checks whether the field has a current.
+    pub fn does_field_have_current(&self, coords: CubeVec) -> bool {
+        self.segment_with_index_at(coords)
+            .map(|(i, s)| {
+                let next_dir: CubeVec = self.segments.get(i + 1).map(|s| s.direction).unwrap_or(self.next_direction).into();
+                [
+                    s.center - s.direction,
+                    s.center,
+                    s.center + next_dir,
+                    s.center + 2 * next_dir,
+                ].contains(&coords)
+            })
+            .unwrap_or(false)
+    }
+
+    /// Fetches the segment containing the given coordinates.
+    pub fn segment_at(&self, coords: CubeVec) -> Option<&Segment> {
+        self.segment_with_index_at(coords).map(|(_, s)| s)
+    }
+
+    /// Fetches the index of the segment at the given coordinates.
+    pub fn segment_index_at(&self, coords: CubeVec) -> Option<usize> {
+        self.segment_with_index_at(coords).map(|(i, _)| i)
+    }
+
+    /// Fetches the index of the segment containing the given coordinates.
+    pub fn segment_with_index_at(&self, coords: CubeVec) -> Option<(usize, &Segment)> {
+        self.segments.iter().enumerate().find(|(_, s)| s.get_global(coords).is_some())
+    }
 }
 
 impl TryFrom<&Element> for Board {
