@@ -1,5 +1,7 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/Segment.kt
 
+use std::ops::Index;
+
 use crate::util::{Error, Result, Element};
 
 use super::{CubeDir, CubeVec, Field};
@@ -36,6 +38,17 @@ impl Segment {
     pub fn get_local(&self, coords: CubeVec) -> Option<&Field> {
         let array_x = coords.q().max(-coords.s()) as usize;
         self.fields.get(array_x + 1).and_then(|c| c.get(coords.r() as usize + 2))
+    }
+}
+
+impl Index<CubeVec> for Segment {
+    type Output = Field;
+
+    fn index(&self, coords: CubeVec) -> &Self::Output {
+        match self.get_global(coords) {
+            Some(field) => field,
+            None => panic!("The global coordinates {} (locally: {}) are outside the segment's bounds!", coords, self.global_to_local(coords)),
+        }
     }
 }
 

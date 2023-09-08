@@ -1,10 +1,10 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/Board.kt
 
-use std::ops::Range;
+use std::ops::{Range, Index};
 
 use crate::util::{Element, Error, Result, Vec2};
 
-use super::{CubeDir, Segment, CubeVec, Field};
+use super::{CubeDir, Segment, CubeVec, Field, Ship};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Board {
@@ -55,6 +55,24 @@ impl Board {
             .unwrap_or(false)
     }
 
+    /// Fetches the distance between two fields as the number of segments.
+    pub fn segment_distance(&self, coords1: CubeVec, coords2: CubeVec) -> usize {
+        // TODO: Better error-handling
+        let i1 = self.segment_index_at(coords1).expect("First coordinates of segment distance are out-of-bounds");
+        let i2 = self.segment_index_at(coords2).expect("Second coordinates of segment distance are out-of-bounds");
+        i1.abs_diff(i2)
+    }
+
+    /// Fetches a list of neighboring fields.
+    pub fn neighbors(&self, coords: CubeVec) -> [Option<&Field>; 6] {
+        CubeDir::ALL.map(|d| self.get(coords + d))
+    }
+
+    /// The effective speed of the given ship, depending on current.
+    pub fn effective_speed(&self, ship: Ship) -> usize {
+        ship.speed - (self.does_field_have_current(ship.position) as usize)
+    }
+
     /// Fetches the segment containing the given coordinates.
     pub fn segment_at(&self, coords: CubeVec) -> Option<&Segment> {
         self.segment_with_index_at(coords).map(|(_, s)| s)
@@ -68,6 +86,17 @@ impl Board {
     /// Fetches the index of the segment containing the given coordinates.
     pub fn segment_with_index_at(&self, coords: CubeVec) -> Option<(usize, &Segment)> {
         self.segments.iter().enumerate().find(|(_, s)| s.get_global(coords).is_some())
+    }
+}
+
+impl Index<CubeVec> for Board {
+    type Output = Field;
+
+    fn index(&self, coords: CubeVec) -> &Self::Output {
+        match self.get(coords) {
+            Some(field) => field,
+            None => panic!("The coordinates {} are outside the board's bounds!", coords),
+        }
     }
 }
 
