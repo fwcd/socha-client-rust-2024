@@ -1,6 +1,6 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/Board.kt
 
-use std::ops::{Range, Index};
+use std::ops::{Range, Index, IndexMut};
 
 use crate::util::{Element, Error, Result, Vec2};
 
@@ -38,6 +38,13 @@ impl Board {
         self.segments.iter()
             .find(|s| (s.center - coords).length() <= 3.0)
             .and_then(|s| s.get_global(coords))
+    }
+
+    /// Fetches the field at the given position mutably.
+    pub fn get_mut(&mut self, coords: CubeVec) -> Option<&mut Field> {
+        self.segments.iter_mut()
+            .find(|s| (s.center - coords).length() <= 3.0)
+            .and_then(|s| s.get_global_mut(coords))
     }
 
     /// Checks whether the field has a current.
@@ -94,6 +101,15 @@ impl Index<CubeVec> for Board {
 
     fn index(&self, coords: CubeVec) -> &Self::Output {
         match self.get(coords) {
+            Some(field) => field,
+            None => panic!("The coordinates {} are outside the board's bounds!", coords),
+        }
+    }
+}
+
+impl IndexMut<CubeVec> for Board {
+    fn index_mut(&mut self, coords: CubeVec) -> &mut Self::Output {
+        match self.get_mut(coords) {
             Some(field) => field,
             None => panic!("The coordinates {} are outside the board's bounds!", coords),
         }
