@@ -313,7 +313,7 @@ impl MoveIterator {
                     let mut new_state = state.clone();
                     new_state.ships = state.ships.map(|s| {
                         if s.team == state.current_team() {
-                            s.child(acc)
+                            s.accelerated(acc.acc)
                         } else {
                             s
                         }
