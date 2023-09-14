@@ -267,9 +267,7 @@ impl State {
 
     /// Fetches the possible moves.
     pub fn possible_moves(&self) -> MoveIterator {
-        let mut queue = VecDeque::new();
-        queue.push_back((self.clone(), Move::new()));
-        MoveIterator { queue }
+        MoveIterator::new(self.clone())
     }
 
     /// Whether the player can move.
@@ -508,6 +506,12 @@ pub struct MoveIterator {
 }
 
 impl MoveIterator {
+    fn new(state: State) -> Self {
+        let mut queue = VecDeque::new();
+        queue.push_back((state, Move::new()));
+        MoveIterator { queue }
+    }
+
     fn process(&mut self) -> Option<Move> {
         if let Some((state, current_move)) = self.queue.pop_front() {
             if !matches!(current_move.last(), Some(Action::Advance(_))) {
