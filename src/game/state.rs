@@ -4,7 +4,7 @@ use std::collections::VecDeque;
 
 use arrayvec::ArrayVec;
 
-use crate::util::{Element, Error, Result, Perform};
+use crate::util::{Element, Error, Result, Perform, UnwrapInfallible};
 
 use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, Accelerate, MIN_SPEED, Action, AccelerateProblem, ActionProblem, PushProblem, TurnProblem};
 
@@ -280,7 +280,7 @@ impl Perform<Accelerate> for State {
             }
         }
 
-        self.current_ship().perform(acc).unwrap();
+        self.current_ship().perform(acc).unwrap_infallible();
 
         if self.current_ship().coal < 0 {
             return Err(AccelerateProblem::InsufficientCoal);
