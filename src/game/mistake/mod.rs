@@ -1,10 +1,12 @@
 mod accelerate;
 mod advance;
+mod r#move;
 mod push;
 mod turn;
 
 pub use accelerate::*;
 pub use advance::*;
+pub use r#move::*;
 pub use push::*;
 pub use turn::*;
 
