@@ -1,3 +1,5 @@
+use std::ops::{Add, AddAssign, SubAssign, Sub};
+
 use crate::util::{Element, Error, Result};
 
 /// Advancement in the direction of movement.
@@ -11,6 +13,34 @@ impl Advance {
     /// Creates a new advancement with the given distance.
     pub fn new(distance: i32) -> Self {
         Self { distance }
+    }
+}
+
+impl Add<Advance> for Advance {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self {
+        Advance { distance: self.distance + rhs.distance }
+    }
+}
+
+impl AddAssign for Advance {
+    fn add_assign(&mut self, rhs: Self) {
+        self.distance += rhs.distance;
+    }
+}
+
+impl Sub<Advance> for Advance {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self {
+        Advance { distance: self.distance - rhs.distance }
+    }
+}
+
+impl SubAssign for Advance {
+    fn sub_assign(&mut self, rhs: Self) {
+        self.distance -= rhs.distance;
     }
 }
 
