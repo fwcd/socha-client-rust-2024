@@ -16,7 +16,7 @@ pub struct Ship {
     pub coal: i32,
     pub passengers: usize,
     pub free_turns: i32,
-    pub points: usize,
+    pub points: i32,
     pub movement: i32,
     pub free_acc: i32,
 }

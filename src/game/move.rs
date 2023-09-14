@@ -43,16 +43,19 @@ impl Move {
     pub fn is_empty(&self) -> bool {
         self.actions.is_empty()
     }
-}
 
-impl<T> Perform<Move> for T where T: Perform<Action> {
-    type Error = T::Error;
-
-    fn perform(&mut self, m: Move) -> Result<(), T::Error> {
-        for action in m.actions {
-            self.perform(action)?;
+    /// Coalesces advances.
+    pub fn coalesced(&self) -> Move {
+        let mut actions = Vec::with_capacity(self.actions.capacity());
+        for action in &self.actions {
+            if let (Some(Action::Advance(last)), Action::Advance(current)) = (actions.last(), action) {
+                let count = actions.len();
+                actions[count - 1] = Action::Advance(*last + *current);
+            } else {
+                actions.push(*action);
+            }
         }
-        Ok(())
+        Move { actions }
     }
 }
 

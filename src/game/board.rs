@@ -4,7 +4,7 @@ use std::ops::{Range, Index, IndexMut};
 
 use crate::util::{Element, Error, Result, Vec2};
 
-use super::{CubeDir, Segment, CubeVec, Field, Ship};
+use super::{CubeDir, Segment, CubeVec, Field, Ship, POINTS_PER_SEGMENT, POINTS_PER_PASSENGER};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Board {
@@ -127,6 +127,17 @@ impl Board {
     /// Fetches the index of the segment containing the given coordinates.
     pub fn segment_with_index_at(&self, coords: CubeVec) -> Option<(usize, &Segment)> {
         self.segments.iter().enumerate().find(|(_, s)| s.get_global(coords).is_some())
+    }
+
+    /// The advance points for the given ship.
+    pub fn ship_advance_points(&self, ship: Ship) -> Option<i32> {
+        let (i, segment) = self.segment_with_index_at(ship.position)?;
+        Some(i as i32 * POINTS_PER_SEGMENT + segment.global_to_local(ship.position).array_x() + 1)
+    }
+
+    /// The computed points for the given ship.
+    pub fn ship_points(&self, ship: Ship) -> Option<i32> {
+        Some(self.ship_advance_points(ship)? + ship.passengers as i32 * POINTS_PER_PASSENGER)
     }
 }
 

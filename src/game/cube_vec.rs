@@ -65,6 +65,10 @@ impl CubeVec {
     #[inline]
     pub fn s(self) -> i32 { self.s }
 
+    /// The array x-component of this vector.
+    #[inline]
+    pub fn array_x(self) -> i32 { self.q.max(-self.s) }
+
     /// Rotates by vector by the given amount of turns to the right.
     pub fn rotated_by(self, turns: i32) -> CubeVec {
         let components: [i32; 3] = self.into();

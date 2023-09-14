@@ -11,8 +11,8 @@ pub const FREE_ACC: i32 = 1;
 // Points
 pub const FINISH_POINTS: usize = 6;
 
-pub const POINTS_PER_PASSENGER: usize = 5;
-pub const POINTS_PER_SEGMENT: usize = 5;
+pub const POINTS_PER_PASSENGER: i32 = 5;
+pub const POINTS_PER_SEGMENT: i32 = 5;
 
 pub const NUMBER_OF_PASSENGERS: usize = 5;
 

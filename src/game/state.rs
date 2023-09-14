@@ -6,7 +6,7 @@ use arrayvec::ArrayVec;
 
 use crate::util::{Element, Error, Result, Perform, UnwrapInfallible};
 
-use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, Accelerate, MIN_SPEED, Action, AccelerateProblem, ActionProblem, PushProblem, TurnProblem};
+use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, Accelerate, MIN_SPEED, Action, AccelerateProblem, ActionProblem, PushProblem, TurnProblem, MoveMistake, ROUND_LIMIT};
 
 /// The state of the game at a point in time.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -241,7 +241,23 @@ impl State {
 
     /// Whether the game is over.
     pub fn is_over(&self) -> bool {
-        todo!()
+        // Case 1: Ship with two passengers reaches a goal field with speed 1
+        (self.turn % 2 == 0 && self.ships.into_iter().any(|s| self.is_winner(s)))
+        // Case 2: Player performs an invalid move => this is handled via `MoveMistake` errors
+        // Case 3: A ship is more than 3 segments behind at the end of a round
+        || self.board.segment_distance(self.ships[0].position, self.ships[1].position) > 3
+        // Case 4: The round limit of 30 rounds has been reached
+        || self.turn / 2 >= ROUND_LIMIT
+        // Case 5: Neither player can move
+        || (self.last_move.is_none() && !self.can_move())
+        // Otherwise the game continues...
+    }
+
+    /// Whether the given ship is a winner.
+    fn is_winner(&self, ship: Ship) -> bool {
+        ship.passengers > 1
+        && self.board.effective_speed(ship) < 2
+        && matches!(self.board.get(ship.position), Some(Field::Goal))
     }
 
     /// Fetches the winner, if any.
@@ -254,6 +270,31 @@ impl State {
         let mut queue = VecDeque::new();
         queue.push_back((self.clone(), Move::new()));
         MoveIterator { queue }
+    }
+
+    /// Whether the player can move.
+    pub fn can_move(&self) -> bool {
+        self.possible_moves().next().is_some()
+    }
+
+    /// Increments the turn and updates the current team.
+    fn advance_turn(&mut self) {
+        let ship = self.current_ship_mut();
+        ship.free_acc = 1;
+        ship.free_turns = 1;
+        ship.movement = ship.speed;
+
+        self.turn += 1;
+        self.current_team = if self.turn % 2 == 0 {
+            self.determine_ahead_team()
+        } else {
+            self.current_team.opponent()
+        };
+
+        if !self.can_move() && !self.is_over() {
+            self.last_move = None;
+            self.advance_turn();
+        }
     }
 }
 
@@ -381,6 +422,64 @@ impl Perform<Action> for State {
             Action::Push(push) => self.perform(push)?,
             Action::Turn(turn) => self.perform(turn)?,
         })
+    }
+}
+
+impl Perform<Move> for State {
+    type Error = MoveMistake;
+
+    fn perform(&mut self, m: Move) -> Result<(), MoveMistake> {
+        if m.is_empty() {
+            return Err(MoveMistake::NoActions);
+        }
+
+        for (i, action) in m.coalesced().into_iter().enumerate() {
+            if i != 0 && self.board.is_sandbank_at(self.current_ship().position) {
+                return Err(MoveMistake::SandbankEnd);
+            }
+            if self.must_push() && !matches!(action, Action::Push(_)) {
+                return Err(MoveMistake::PushActionRequired);
+            }
+            if i != 0 && matches!(action, Action::Accelerate(_)) {
+                return Err(MoveMistake::FirstActionAccelerate);
+            }
+            self.perform(action)?;
+        }
+
+        match self.current_ship().movement {
+            p if p > 0 => return Err(MoveMistake::MovementPointsLeft),
+            p if p < 0 => return Err(MoveMistake::MovementPointsMissing),
+            _ => {},
+        }
+
+        // Note: We can't use `current_ship_mut()` since we need to prove to the
+        // borrow checker that these mutable borrows don't overlap when mutating
+        // `board`. Additionally, we need a mutable reference to each of the
+        // ships, therefore we need to juggle a bit with `split_at_mut`...
+        // Perhaps we should wrap the `[Ship; 2]` and then add a convenience
+        // method for mutably borrowing 'our' and the other ship (given a team).
+        // Maybe we'd just want to store the ships directly as fields (rather
+        // than as an array)? The downside would be that deserialization would
+        // be a bit less convenient (and require some manual validation)
+        let (front, back) = self.ships.split_at_mut(1);
+        let (ship, other_ship) = match self.current_team {
+            Team::One => (&mut front[0], &mut back[0]),
+            Team::Two => (&mut back[0], &mut front[0]),
+        };
+
+        self.board.pick_up_passenger(ship);
+        ship.points = self.board.ship_points(*ship).expect("Could not calculate ship points");
+        if m.actions.iter().any(|a| matches!(a, Action::Push(_))) {
+            if other_ship.speed == 1 {
+                self.board.pick_up_passenger(other_ship);
+            }
+            other_ship.points = self.board.ship_points(*other_ship).expect("Could not calculate other ship's points");
+        }
+
+        self.last_move = Some(m);
+        self.advance_turn();
+
+        Ok(())
     }
 }
 
