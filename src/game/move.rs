@@ -1,5 +1,7 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/Field.kt
 
+use std::convert::Infallible;
+
 use crate::util::{Error, Element, Result, Perform};
 
 use super::Action;
@@ -44,12 +46,13 @@ impl Move {
 }
 
 impl<T> Perform<Move> for T where T: Perform<Action> {
-    type Output = ();
+    type Error = T::Error;
 
-    fn perform(&mut self, m: Move) {
+    fn perform(&mut self, m: Move) -> Result<(), T::Error> {
         for action in m.actions {
-            self.perform(action);
+            self.perform(action)?;
         }
+        Ok(())
     }
 }
 
@@ -60,10 +63,11 @@ impl From<Action> for Move {
 }
 
 impl Perform<Action> for Move {
-    type Output = ();
+    type Error = Infallible;
 
-    fn perform(&mut self, action: Action) {
+    fn perform(&mut self, action: Action) -> Result<(), Infallible> {
         self.actions.push(action);
+        Ok(())
     }
 }
 

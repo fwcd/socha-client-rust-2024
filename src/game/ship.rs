@@ -1,5 +1,7 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/Ship.kt
 
+use std::convert::Infallible;
+
 use crate::util::{Element, Error, Result, Perform};
 
 use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir, Team, FREE_ACC, Accelerate};
@@ -50,9 +52,9 @@ impl Ship {
 }
 
 impl Perform<Accelerate> for Ship {
-    type Output = ();
+    type Error = Infallible;
 
-    fn perform(&mut self, acc: Accelerate) {
+    fn perform(&mut self, acc: Accelerate) -> Result<(), Infallible> {
         let used_coal = acc.acc.abs() - self.free_acc;
         if used_coal > 0 {
             self.coal -= used_coal;
@@ -61,6 +63,7 @@ impl Perform<Accelerate> for Ship {
             self.free_acc = used_coal.abs();
         }
         self.accelerate(acc.acc);
+        Ok(())
     }
 }
 

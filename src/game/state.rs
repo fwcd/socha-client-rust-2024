@@ -6,7 +6,7 @@ use arrayvec::ArrayVec;
 
 use crate::util::{Element, Error, Result, Perform};
 
-use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, Accelerate, MIN_SPEED, Action, AccelerateProblem, ActionProblem};
+use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, Accelerate, MIN_SPEED, Action, AccelerateProblem, ActionProblem, PushProblem, TurnProblem};
 
 /// The state of the game at a point in time.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -258,7 +258,7 @@ impl State {
 }
 
 impl Perform<Accelerate> for State {
-    type Output = Result<(), AccelerateProblem>;
+    type Error = AccelerateProblem;
 
     fn perform(&mut self, acc: Accelerate) -> Result<(), AccelerateProblem> {
         if acc.acc == 0 {
@@ -280,7 +280,7 @@ impl Perform<Accelerate> for State {
             }
         }
 
-        self.current_ship().perform(acc);
+        self.current_ship().perform(acc).unwrap();
 
         if self.current_ship().coal < 0 {
             return Err(AccelerateProblem::InsufficientCoal);
@@ -291,7 +291,7 @@ impl Perform<Accelerate> for State {
 }
 
 impl Perform<Advance> for State {
-    type Output = Result<(), AdvanceProblem>;
+    type Error = AdvanceProblem;
 
     fn perform(&mut self, adv: Advance) -> Result<(), AdvanceProblem> {
         if (adv.distance < MIN_SPEED && !self.board.is_sandbank_at(self.current_ship().position))
@@ -321,9 +321,9 @@ impl Perform<Advance> for State {
 }
 
 impl Perform<Push> for State {
-    type Output = ();
+    type Error = PushProblem;
 
-    fn perform(&mut self, push: Push) {
+    fn perform(&mut self, push: Push) -> Result<(), PushProblem> {
         // TODO: Add error handling to the `Perform` trait, return `Result<(), PushProblem>` and implement checks
         // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Push.kt
         let team = self.current_team();
@@ -344,13 +344,14 @@ impl Perform<Push> for State {
 
         nudged_ship.position = push_to;
         nudged_ship.free_turns += 1;
+        Ok(())
     }
 }
 
 impl Perform<Turn> for State {
-    type Output = ();
+    type Error = TurnProblem;
 
-    fn perform(&mut self, turn: Turn) {
+    fn perform(&mut self, turn: Turn) -> Result<(), TurnProblem> {
         // TODO: Add error handling to the `Perform` trait, return `Result<(), TurnProblem>` and implement checks
         // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Turn.kt
 
@@ -365,19 +366,20 @@ impl Perform<Turn> for State {
         }
 
         self.current_ship_mut().direction = turn.direction;
+        Ok(())
     }
 }
 
 impl Perform<Action> for State {
-    type Output = Result<(), ActionProblem>;
+    type Error = ActionProblem;
 
     /// Performs the given action.
     fn perform(&mut self, action: Action) -> Result<(), ActionProblem> {
         Ok(match action {
             Action::Accelerate(acc) => self.perform(acc)?,
             Action::Advance(adv) => self.perform(adv)?,
-            Action::Push(push) => self.perform(push),
-            Action::Turn(turn) => self.perform(turn),
+            Action::Push(push) => self.perform(push)?,
+            Action::Turn(turn) => self.perform(turn)?,
         })
     }
 }
@@ -411,14 +413,17 @@ impl MoveIterator {
         if let Some((state, current_move)) = self.queue.pop_front() {
             if !matches!(current_move.last(), Some(Action::Advance(_))) {
                 for adv in state.possible_advances() {
-                    let child_state = state.child(adv);
-                    let child_move = current_move.child(Action::Advance(adv));
+                    let child_state = state.child(adv).unwrap();
+                    let child_move = current_move.child(Action::Advance(adv)).unwrap();
                     let pushes = child_state.possible_pushes();
                     if pushes.is_empty() {
                         self.queue.push_back((child_state, child_move));
                     } else {
                         for push in pushes {
-                            self.queue.push_back((child_state.child(push), child_move.child(Action::Push(push))));
+                            self.queue.push_back((
+                                child_state.child(push).unwrap(),
+                                child_move.child(Action::Push(push)).unwrap(),
+                            ));
                         }
                     }
                 }
@@ -426,7 +431,10 @@ impl MoveIterator {
 
             if !matches!(current_move.last(), Some(Action::Turn(_))) {
                 for turn in state.possible_turns() {
-                    self.queue.push_back((state.child(turn), current_move.child(Action::Turn(turn))));
+                    self.queue.push_back((
+                        state.child(turn).unwrap(),
+                        current_move.child(Action::Turn(turn)).unwrap(),
+                    ));
                 }
             }
 

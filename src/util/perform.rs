@@ -1,13 +1,13 @@
 pub trait Perform<Item>: Clone {
-    type Output;
+    type Error;
 
     /// Performs the given item.
-    fn perform(&mut self, item: Item) -> Self::Output;
+    fn perform(&mut self, item: Item) -> Result<(), Self::Error>;
 
     /// The child state after having performed the given item.
-    fn child(&self, item: Item) -> Self {
+    fn child(&self, item: Item) -> Result<Self, Self::Error> {
         let mut next = self.clone();
-        next.perform(item);
-        next
+        next.perform(item)?;
+        Ok(next)
     }
 }
