@@ -291,20 +291,32 @@ impl Perform<Accelerate> for State {
 }
 
 impl Perform<Advance> for State {
-    type Output = ();
+    type Output = Result<(), AdvanceProblem>;
 
-    fn perform(&mut self, adv: Advance) {
-        // TODO: Add error handling to the `Perform` trait, return `Result<(), AdvancementProblem>` and implement checks
-        // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Advance.kt
+    fn perform(&mut self, adv: Advance) -> Result<(), AdvanceProblem> {
+        if (adv.distance < MIN_SPEED && !self.board.is_sandbank_at(self.current_ship().position))
+            || adv.distance > MAX_SPEED {
+            return Err(AdvanceProblem::InvalidDistance);
+        }
+        if adv.distance > self.current_ship().movement {
+            return Err(AdvanceProblem::MovementPointsMissing);
+        }
 
         let limit = self.advance_limit_with(
             self.current_ship().position,
             self.current_ship().direction.opposite_if(adv.distance < 0),
             self.current_ship().movement
         );
+
+        if limit.distance() < adv.distance.abs() {
+            return Err(limit.problem);
+        }
+
         let ship = self.current_ship_mut();
         ship.position += CubeVec::from(ship.direction) * adv.distance;
         ship.movement -= limit.cost_until(adv.distance);
+
+        Ok(())
     }
 }
 
@@ -363,7 +375,7 @@ impl Perform<Action> for State {
     fn perform(&mut self, action: Action) -> Result<(), ActionProblem> {
         Ok(match action {
             Action::Accelerate(acc) => self.perform(acc)?,
-            Action::Advance(adv) => self.perform(adv),
+            Action::Advance(adv) => self.perform(adv)?,
             Action::Push(push) => self.perform(push),
             Action::Turn(turn) => self.perform(turn),
         })
@@ -381,8 +393,8 @@ impl AdvanceLimit {
         self.costs[distance as usize - 1]
     }
 
-    pub fn distance(&self) -> usize {
-        self.costs.len()
+    pub fn distance(&self) -> i32 {
+        self.costs.len() as i32
     }
 
     pub fn advances(&self) -> impl Iterator<Item = Advance> {
