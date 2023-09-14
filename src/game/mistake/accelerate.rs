@@ -4,4 +4,5 @@ pub enum AccelerateProblem {
     AboveMaxSpeed,
     BelowMinSpeed,
     OnSandbank,
+    InsufficientCoal,
 }

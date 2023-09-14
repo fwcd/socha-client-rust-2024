@@ -6,7 +6,7 @@ use arrayvec::ArrayVec;
 
 use crate::util::{Element, Error, Result, Perform};
 
-use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, Accelerate, MIN_SPEED, Action};
+use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, Accelerate, MIN_SPEED, Action, AccelerateProblem, ActionProblem};
 
 /// The state of the game at a point in time.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -129,7 +129,7 @@ impl State {
 
     /// Fetches the possible turn actions for the current player consuming
     /// at most the specified number of coal units.
-    fn possible_turns_with(&self, max_coal: usize) -> Vec<Turn> {
+    fn possible_turns_with(&self, max_coal: i32) -> Vec<Turn> {
         let ship = self.current_ship();
         if self.must_push() || self.board.is_sandbank_at(ship.position) {
             return Vec::new();
@@ -153,13 +153,13 @@ impl State {
 
     /// Fetches the possible accelerations for the current player with the given
     /// amount of coal.
-    fn possible_accelerations_with(&self, max_coal: usize) -> Vec<Accelerate> {
+    fn possible_accelerations_with(&self, max_coal: i32) -> Vec<Accelerate> {
         if self.must_push() {
             return Vec::new();
         }
 
         let ship = self.current_ship();
-        return (1..=(max_coal as i32 + ship.free_acc))
+        return (1..=(max_coal + ship.free_acc))
             .flat_map(|i| [i, -i])
             .filter(|&i| if i > 0 { MAX_SPEED >= ship.speed + i } else { MIN_SPEED <= ship.speed - i })
             .map(Accelerate::new)
@@ -258,13 +258,35 @@ impl State {
 }
 
 impl Perform<Accelerate> for State {
-    type Output = ();
+    type Output = Result<(), AccelerateProblem>;
 
-    fn perform(&mut self, acc: Accelerate) {
-        // TODO: Add error handling to the `Perform` trait, return `Result<(), AccelerateProblem>` and implement checks
-        // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Accelerate.kt#L41C22-L41C22
+    fn perform(&mut self, acc: Accelerate) -> Result<(), AccelerateProblem> {
+        if acc.acc == 0 {
+            return Err(AccelerateProblem::ZeroAcc);
+        }
 
-        self.current_ship().perform(acc)
+        {
+            let ship = self.current_ship();
+
+            match ship.speed {
+                // TODO: Can we match against the MAX_SPEED/MIN_SPEED constants?
+                7.. => return Err(AccelerateProblem::AboveMaxSpeed),
+                ..=0 => return Err(AccelerateProblem::BelowMinSpeed),
+                _ => {},
+            }
+
+            if self.board.is_sandbank_at(ship.position) {
+                return Err(AccelerateProblem::InsufficientCoal);
+            }
+        }
+
+        self.current_ship().perform(acc);
+
+        if self.current_ship().coal < 0 {
+            return Err(AccelerateProblem::InsufficientCoal);
+        }
+
+        Ok(())
     }
 }
 
@@ -325,9 +347,9 @@ impl Perform<Turn> for State {
         let free_turns = self.current_ship().free_turns as i32;
         let used_coal = abs_turn_count - free_turns;
 
-        self.current_ship_mut().free_turns = (free_turns - abs_turn_count).max(0) as usize;
+        self.current_ship_mut().free_turns = (free_turns - abs_turn_count).max(0);
         if used_coal > 0 {
-            self.current_ship_mut().coal -= used_coal as usize;
+            self.current_ship_mut().coal -= used_coal;
         }
 
         self.current_ship_mut().direction = turn.direction;
@@ -335,16 +357,16 @@ impl Perform<Turn> for State {
 }
 
 impl Perform<Action> for State {
-    type Output = ();
+    type Output = Result<(), ActionProblem>;
 
     /// Performs the given action.
-    fn perform(&mut self, action: Action) {
-        match action {
-            Action::Accelerate(acc) => self.perform(acc),
+    fn perform(&mut self, action: Action) -> Result<(), ActionProblem> {
+        Ok(match action {
+            Action::Accelerate(acc) => self.perform(acc)?,
             Action::Advance(adv) => self.perform(adv),
             Action::Push(push) => self.perform(push),
             Action::Turn(turn) => self.perform(turn),
-        }
+        })
     }
 }
 

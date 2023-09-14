@@ -3,7 +3,7 @@
 pub const ROUND_LIMIT: usize = 30;
     
 // Ship Properties
-pub const START_COAL: usize = 6;
+pub const START_COAL: i32 = 6;
 pub const MIN_SPEED: i32 = 1;
 pub const MAX_SPEED: i32 = 6;
 pub const FREE_ACC: i32 = 1;

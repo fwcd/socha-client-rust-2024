@@ -2,7 +2,7 @@
 
 use crate::util::{Element, Error, Result, Perform};
 
-use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir, Team, FREE_ACC, Accelerate, Advance};
+use super::{CubeVec, MIN_SPEED, START_COAL, CubeDir, Team, FREE_ACC, Accelerate};
 
 /// A player's game piece.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -11,9 +11,9 @@ pub struct Ship {
     pub position: CubeVec,
     pub direction: CubeDir,
     pub speed: i32,
-    pub coal: usize,
+    pub coal: i32,
     pub passengers: usize,
-    pub free_turns: usize,
+    pub free_turns: i32,
     pub points: usize,
     pub movement: i32,
     pub free_acc: i32,
@@ -55,7 +55,7 @@ impl Perform<Accelerate> for Ship {
     fn perform(&mut self, acc: Accelerate) {
         let used_coal = acc.acc.abs() - self.free_acc;
         if used_coal > 0 {
-            self.coal -= used_coal as usize;
+            self.coal -= used_coal;
             self.free_acc = 0;
         } else {
             self.free_acc = used_coal.abs();
