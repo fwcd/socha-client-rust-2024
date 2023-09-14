@@ -50,6 +50,8 @@ impl Ship {
 }
 
 impl Perform<Accelerate> for Ship {
+    type Output = ();
+
     fn perform(&mut self, acc: Accelerate) {
         let used_coal = acc.acc.abs() - self.free_acc;
         if used_coal > 0 {

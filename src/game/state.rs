@@ -258,6 +258,8 @@ impl State {
 }
 
 impl Perform<Accelerate> for State {
+    type Output = ();
+
     fn perform(&mut self, acc: Accelerate) {
         // TODO: Add error handling to the `Perform` trait, return `Result<(), AccelerateProblem>` and implement checks
         // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Accelerate.kt#L41C22-L41C22
@@ -267,6 +269,8 @@ impl Perform<Accelerate> for State {
 }
 
 impl Perform<Advance> for State {
+    type Output = ();
+
     fn perform(&mut self, adv: Advance) {
         // TODO: Add error handling to the `Perform` trait, return `Result<(), AdvancementProblem>` and implement checks
         // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Advance.kt
@@ -283,6 +287,8 @@ impl Perform<Advance> for State {
 }
 
 impl Perform<Push> for State {
+    type Output = ();
+
     fn perform(&mut self, push: Push) {
         // TODO: Add error handling to the `Perform` trait, return `Result<(), PushProblem>` and implement checks
         // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Push.kt
@@ -308,6 +314,8 @@ impl Perform<Push> for State {
 }
 
 impl Perform<Turn> for State {
+    type Output = ();
+
     fn perform(&mut self, turn: Turn) {
         // TODO: Add error handling to the `Perform` trait, return `Result<(), TurnProblem>` and implement checks
         // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Turn.kt
@@ -327,6 +335,8 @@ impl Perform<Turn> for State {
 }
 
 impl Perform<Action> for State {
+    type Output = ();
+
     /// Performs the given action.
     fn perform(&mut self, action: Action) {
         match action {

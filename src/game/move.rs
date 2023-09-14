@@ -44,6 +44,8 @@ impl Move {
 }
 
 impl<T> Perform<Move> for T where T: Perform<Action> {
+    type Output = ();
+
     fn perform(&mut self, m: Move) {
         for action in m.actions {
             self.perform(action);
@@ -58,6 +60,8 @@ impl From<Action> for Move {
 }
 
 impl Perform<Action> for Move {
+    type Output = ();
+
     fn perform(&mut self, action: Action) {
         self.actions.push(action);
     }
