@@ -1,10 +1,10 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/GameState.kt
 
-use std::collections::VecDeque;
+use std::{collections::VecDeque, fmt};
 
 use arrayvec::ArrayVec;
 
-use crate::util::{Element, Error, Result, Perform, UnwrapInfallible};
+use crate::util::{Element, Error, Result, Perform, UnwrapInfallible, Vec2};
 
 use super::{Board, Move, Team, Ship, Turn, CubeVec, CubeDir, Push, Advance, AdvanceProblem, MAX_SPEED, Field, Accelerate, MIN_SPEED, Action, AccelerateProblem, ActionProblem, PushProblem, TurnProblem, MoveMistake, ROUND_LIMIT};
 
@@ -577,6 +577,45 @@ impl Iterator for MoveIterator {
     fn next(&mut self) -> Option<Move> {
         self.find_next();
         self.process()
+    }
+}
+
+impl fmt::Display for State {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // TODO: Use better coordinate conversion
+        let (xs, ys) = self.board.bounds();
+        for y in ys {
+            for x in xs.clone() {
+                let cube_pos = CubeVec::from(Vec2::new(x, y));
+                let c = self.ships
+                    .into_iter()
+                    .enumerate()
+                    .find(|(_, s)| s.position == cube_pos)
+                    .and_then(|(i, _)| char::from_digit(i as u32, 10))
+                    .unwrap_or_else(|| match self.board.get(cube_pos) {
+                        Some(Field::Water) => '~',
+                        Some(Field::Island) => '#',
+                        Some(Field::Sandbank) => '_',
+                        Some(Field::Passenger { direction, passenger }) => if *passenger > 0 {
+                            match direction {
+                                CubeDir::Right => '>',
+                                CubeDir::DownRight => '\\',
+                                CubeDir::DownLeft => '/',
+                                CubeDir::Left => '<',
+                                CubeDir::UpLeft => '`',
+                                CubeDir::UpRight => '´',
+                            }
+                        } else {
+                            '0'
+                        },
+                        Some(Field::Goal) => 'G',
+                        None => '.',
+                    });
+                write!(f, "{}", c)?;
+            }
+            writeln!(f)?;
+        }
+        Ok(())
     }
 }
 
