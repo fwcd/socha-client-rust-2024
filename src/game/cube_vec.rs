@@ -8,6 +8,7 @@ use super::CubeDir;
 //       We have a few options for that:
 //        - Generic Vec2/Vec3 types, parameterized over marker types (Offset, Axial, Doubled, Cube, ... and Local, Global)
 //        - Newtype wrappers around Vec2/Vec3 types
+//          - For those, we might consider using https://github.com/JelteF/derive_more to derive the operator traits
 
 /// A cube coordinate vector (or position).
 /// (see https://www.redblobgames.com/grids/hexagons/#coordinates-cube).
