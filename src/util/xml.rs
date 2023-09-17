@@ -4,7 +4,7 @@ use std::convert::TryInto;
 use std::fmt::{self, Debug};
 use std::str::{self, FromStr};
 use std::io::{Write, Cursor, BufRead};
-use log::{warn, error, info, debug, trace};
+use log::{warn, error, info, trace};
 use quick_xml::events::attributes::Attribute;
 use quick_xml::events::{Event, BytesStart, BytesText, BytesEnd};
 use quick_xml::{Reader, Writer};
@@ -88,7 +88,6 @@ impl Element {
             }
         }?;
 
-        debug!("Read {}", element);
         Ok(element)
     }
     
@@ -97,7 +96,6 @@ impl Element {
         self.write_to_impl(writer)?;
         writer.inner().flush()?;
 
-        debug!("Wrote {}", self);
         Ok(())
     }
 
