@@ -4,7 +4,10 @@ use crate::util::{Element, Error, Result, Vec2};
 
 use super::CubeDir;
 
-// TODO: Investigate using marker types to enforce global/local coordinates
+// TODO: Add better representation of different Hex coordinate systems and (orthogonally) local/global coordinates
+//       We have a few options for that:
+//        - Generic Vec2/Vec3 types, parameterized over marker types (Offset, Axial, Doubled, Cube, ... and Local, Global)
+//        - Newtype wrappers around Vec2/Vec3 types
 
 /// A cube coordinate vector (or position).
 /// (see https://www.redblobgames.com/grids/hexagons/#coordinates-cube).
