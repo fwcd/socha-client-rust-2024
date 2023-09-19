@@ -194,7 +194,7 @@ impl State {
         let mut current_pos = start;
         let mut total_cost = 0;
         let mut has_current = false;
-        let max_movement = max_movement.min(MAX_SPEED);
+        let max_movement = max_movement.max(0).min(MAX_SPEED);
         let mut costs = Vec::new();
 
         macro_rules! result {
