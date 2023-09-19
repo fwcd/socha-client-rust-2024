@@ -516,7 +516,7 @@ impl MoveIterator {
         if let Some((state, current_move)) = self.queue.pop_front() {
             if !matches!(current_move.last(), Some(Action::Advance(_))) {
                 for adv in state.possible_advances() {
-                    let child_state = state.child(adv).unwrap();
+                    let child_state = state.child(Move::from(Action::Advance(adv))).unwrap();
                     let child_move = current_move.child(Action::Advance(adv)).unwrap();
                     let pushes = child_state.possible_pushes();
                     if pushes.is_empty() {
@@ -524,7 +524,7 @@ impl MoveIterator {
                     } else {
                         for push in pushes {
                             self.queue.push_back((
-                                child_state.child(push).unwrap(),
+                                state.child(Move::from(Action::Push(push))).unwrap(),
                                 child_move.child(Action::Push(push)).unwrap(),
                             ));
                         }
@@ -535,7 +535,7 @@ impl MoveIterator {
             if !matches!(current_move.last(), Some(Action::Turn(_))) {
                 for turn in state.possible_turns() {
                     self.queue.push_back((
-                        state.child(turn).unwrap(),
+                        state.child(Move::from(Action::Turn(turn))).unwrap(),
                         current_move.child(Action::Turn(turn)).unwrap(),
                     ));
                 }
