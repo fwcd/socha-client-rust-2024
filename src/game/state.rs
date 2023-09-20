@@ -236,7 +236,7 @@ impl State {
             costs.push(total_cost);
         }
 
-        result!(AdvanceProblem::MovementPointsMissing)
+        result!(AdvanceProblem::MovementPointsMissing { distance: None, movement: max_movement })
     }
 
     /// Whether the game is over.
@@ -335,10 +335,10 @@ impl Perform<Advance> for State {
     fn perform(&mut self, adv: Advance) -> Result<(), AdvanceProblem> {
         if (adv.distance < MIN_SPEED && !self.board.is_sandbank_at(self.current_ship().position))
             || adv.distance > MAX_SPEED {
-            return Err(AdvanceProblem::InvalidDistance);
+            return Err(AdvanceProblem::InvalidDistance { distance: adv.distance });
         }
         if adv.distance > self.current_ship().movement {
-            return Err(AdvanceProblem::MovementPointsMissing);
+            return Err(AdvanceProblem::MovementPointsMissing { distance: Some(adv.distance), movement: self.current_ship().movement });
         }
 
         let limit = self.advance_limit_with(

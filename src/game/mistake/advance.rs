@@ -1,8 +1,8 @@
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum AdvanceProblem {
-    MovementPointsMissing,
+    MovementPointsMissing { distance: Option<i32>, movement: i32 },
     InsufficientPush,
-    InvalidDistance,
+    InvalidDistance { distance: i32 },
     ShipAlreadyInTarget,
     FieldIsBlocked,
     MoveEndOnSandbank,
