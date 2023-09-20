@@ -6,8 +6,8 @@ pub enum MoveMistake {
     PushActionRequired,
     SandbankEnd,
     FirstActionAccelerate,
-    MovementPointsLeft,
-    MovementPointsMissing,
+    MovementPointsLeft(i32),
+    MovementPointsMissing(i32),
     ActionFailed(ActionProblem),
 }
 

@@ -440,8 +440,8 @@ impl Perform<Move> for State {
         }
 
         match self.current_ship().movement {
-            p if p > 0 => return Err(MoveMistake::MovementPointsLeft),
-            p if p < 0 => return Err(MoveMistake::MovementPointsMissing),
+            p if p > 0 => return Err(MoveMistake::MovementPointsLeft(p)),
+            p if p < 0 => return Err(MoveMistake::MovementPointsMissing(-p)),
             _ => {},
         }
 
