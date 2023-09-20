@@ -363,8 +363,6 @@ impl Perform<Push> for State {
     type Error = PushProblem;
 
     fn perform(&mut self, push: Push) -> Result<(), PushProblem> {
-        // TODO: Add error handling to the `Perform` trait, return `Result<(), PushProblem>` and implement checks
-        // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Push.kt
         let team = self.current_team();
         let nudged_team = self.other_team();
 
@@ -391,9 +389,6 @@ impl Perform<Turn> for State {
     type Error = TurnProblem;
 
     fn perform(&mut self, turn: Turn) -> Result<(), TurnProblem> {
-        // TODO: Add error handling to the `Perform` trait, return `Result<(), TurnProblem>` and implement checks
-        // See https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/actions/Turn.kt
-
         let turn_count = self.current_ship().direction.turn_count_to(turn.direction);
         let abs_turn_count = turn_count.abs();
         let free_turns = self.current_ship().free_turns as i32;
