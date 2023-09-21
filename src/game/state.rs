@@ -697,9 +697,11 @@ impl TryFrom<&Element> for State {
 
 #[cfg(test)]
 mod tests {
+    use std::{fs::{read_dir, DirEntry, read_to_string, create_dir_all}, str::FromStr, path::PathBuf};
+
     use indoc::indoc;
 
-    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field, FREE_ACC}, util::assert_xml_parse};
+    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field, FREE_ACC, Move}, util::{assert_xml_parse, UnwrapInfallible, Element}};
 
     #[test]
     fn test_xml_parses() {
@@ -847,5 +849,55 @@ mod tests {
             start_team: Team::One,
             current_team: Team::One,
         });
+    }
+
+    #[test]
+    fn test_sensible_moves() {
+        let manifest_dir = PathBuf::from_str(env!("CARGO_MANIFEST_DIR")).unwrap();
+        let game_dir = manifest_dir.join("test").join("example-game");
+
+        create_dir_all(&game_dir).unwrap();
+        let mut entries: Vec<DirEntry> = game_dir.read_dir().unwrap()
+            .map(|e| e.unwrap())
+            .collect();
+    
+        entries.sort_by_key(|e| e.file_name());
+
+        macro_rules! assert_moves_match {
+            ($state:expr, $moves:expr) => {
+                if let Some(ref state) = $state {
+                    if let Some(ref moves) = $moves {
+                        assert_eq!(&state.simple_moves(), moves);
+                    }
+                }
+            };
+        }
+
+        let mut state: Option<State> = None;
+        let mut moves: Option<Vec<Move>> = None;
+        let mut last_turn: Option<usize> = None;
+
+        for entry in entries {
+            let name = entry.file_name().into_string().unwrap();
+            let split: Vec<_> = name.split(".").collect();
+            if *split.last().unwrap() == "xml" {
+                let turn: usize = split[0].parse().unwrap();
+                if last_turn.map(|t| t != turn).unwrap_or(false) {
+                    assert_moves_match!(state, moves);
+                    state = None;
+                    moves = None;
+                }
+                let kind: &str = split[1];
+                let element = Element::from_str(&read_to_string(entry.path()).unwrap()).unwrap();
+                match kind {
+                    "moves" => moves = Some(element.childs().map(|e| Move::try_from(e).unwrap()).collect()),
+                    "state" => state = Some(State::try_from(&element).unwrap()),
+                    _ => {},
+                }
+                last_turn = Some(turn);
+            }
+        }
+
+        assert_moves_match!(state, moves);
     }
 }
