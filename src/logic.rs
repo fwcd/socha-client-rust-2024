@@ -8,7 +8,7 @@ use socha_client_2024::{client::GameClientDelegate, game::{Move, Team, State}, u
 pub struct OwnLogic;
 
 impl GameClientDelegate for OwnLogic {
-    fn request_move(&mut self, state: &State, _my_team: Team) -> Move {
+    fn pick_move(&mut self, state: &State, _my_team: Team) -> Move {
         info!("Requested move");
         let chosen_move = state.simple_moves()
             .choose(&mut thread_rng())
@@ -21,7 +21,7 @@ impl GameClientDelegate for OwnLogic {
         chosen_move
     }
 
-    fn on_update_state(&mut self, state: &State) {
+    fn state_updated(&mut self, state: &State) {
         info!("State:\n{}", state);
     }
 }

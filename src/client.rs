@@ -12,18 +12,18 @@ use crate::util::{Result, Element, Error};
 /// selection strategy.
 pub trait GameClientDelegate {
     /// Invoked whenever the game state updates.
-    fn on_update_state(&mut self, _state: &State) {}
+    fn state_updated(&mut self, _state: &State) {}
     
     /// Invoked when the game ends.
-    fn on_game_end(&mut self, _result: &GameResult) {}
+    fn game_ended(&mut self, _result: &GameResult) {}
     
     /// Invoked when the welcome message is received
     /// with the player's team.
-    fn on_welcome(&mut self, _team: Team) {}
+    fn welcome_received(&mut self, _team: Team) {}
     
     /// Requests a move from the delegate. This method
     /// should implement the "main" game logic.
-    fn request_move(&mut self, state: &State, my_team: Team) -> Move;
+    fn pick_move(&mut self, state: &State, my_team: Team) -> Move;
 }
 
 /// A configuration that determines whether
@@ -124,19 +124,19 @@ impl<D> GameClient<D> where D: GameClientDelegate {
                 Ok(Event::Room { room_id, payload }) => {
                     info!("Got {} in room {}", payload, room_id);
                     match payload {
-                        EventPayload::Welcome(team) => self.delegate.on_welcome(team),
+                        EventPayload::Welcome(team) => self.delegate.welcome_received(team),
                         EventPayload::GameResult(result) => {
-                            self.delegate.on_game_end(&result);
+                            self.delegate.game_ended(&result);
                             game_result = Some(result);
                         },
                         EventPayload::Memento(new_state) => {
-                            self.delegate.on_update_state(&new_state);
+                            self.delegate.state_updated(&new_state);
                             state = Some(new_state);
                         },
                         EventPayload::MoveRequest => {
                             let state = state.as_ref().ok_or_else(|| Error::InvalidState("No state available at move request!".to_owned()))?;
                             let team = state.current_team();
-                            let new_move = self.delegate.request_move(state, team);
+                            let new_move = self.delegate.pick_move(state, team);
                             let request = Request::Room { room_id, payload: RequestPayload::Move(new_move) };
                             let request_xml = Element::from(request);
                             request_xml.write_to(&mut writer)?;
