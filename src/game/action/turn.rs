@@ -1,4 +1,4 @@
-use crate::{util::{Element, Error, Result}, game::CubeDir};
+use crate::{util::{Element, Error, Result}, game::{CubeDir, Ship}};
 
 /// A turn of the ship.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -11,6 +11,11 @@ impl Turn {
     /// Creates a new turn with the given direction.
     pub fn new(direction: CubeDir) -> Self {
         Self { direction }
+    }
+
+    /// The cost in coal for the given ship.
+    pub fn coal_cost(self, ship: Ship) -> i32 {
+        (ship.direction.turn_count_to(self.direction).abs() - ship.free_turns).max(0)
     }
 }
 

@@ -1,6 +1,6 @@
 //! Ported from https://github.com/software-challenge/backend/blob/be88340f619892fe70c4cbd45e131d5445e883c7/plugin/src/main/kotlin/sc/plugin2024/GameState.kt
 
-use std::{collections::VecDeque, fmt};
+use std::{collections::VecDeque, fmt, iter::once};
 
 use arrayvec::ArrayVec;
 
@@ -268,6 +268,66 @@ impl State {
     /// Fetches the possible moves.
     pub fn possible_moves(&self) -> MoveIterator {
         MoveIterator::new(self.clone())
+    }
+
+    // TODO: Add sensible_moves that computes the simple moves and falls back to the iterator otherwise.
+
+    /// Fetches the simple moves for the current ship.
+    pub fn simple_moves(&self) -> Vec<Move> {
+        self.simple_moves_with(self.current_ship().coal.min(1))
+    }
+
+    /// Fetches the simple moves (accelerate + turn + move) using at most the
+    /// given amount of coal.
+    pub fn simple_moves_with(&self, max_coal: i32) -> Vec<Move> {
+        once(None)
+            .chain(self.possible_turns_with(max_coal.min(1)).into_iter().map(Some))
+            .flat_map(|turn| {
+                let direction = turn.map(|t| t.direction).unwrap_or_else(|| self.current_ship().direction);
+                let available_coal = max_coal - turn.map(|t| t.coal_cost(self.current_ship())).unwrap_or(0);
+                let info = self.advance_limit_with(
+                    self.current_ship().position,
+                    direction,
+                    self.current_ship().movement + self.current_ship().free_acc + available_coal,
+                );
+                let min_movement_points = (self.current_ship().movement - self.current_ship().free_acc - available_coal).max(1);
+                let min_distance = info.costs.iter().position(|&c| c >= min_movement_points).map(|c| c as i32 + 1).unwrap_or(0);
+                // TODO: Use either-crate + iterator to avoid boxing?
+                if min_distance < 1 {
+                    Vec::new()
+                } else {
+                    (min_distance..=info.distance())
+                        .filter_map(|dist| {
+                            let acc = Some(Accelerate::new(
+                                info.cost_until(dist)
+                                    + if dist == info.distance() && matches!(info.problem, AdvanceProblem::ShipAlreadyInTarget) { 1 } else { 0 }
+                                    - self.current_ship().movement
+                            )).filter(|a| a.acc != 0 && dist >= 0);
+
+                            let push = if self.current_ship().position + (CubeVec::from(direction) * dist) == self.other_ship().position {
+                                let current_rotation = self.board.segment_at(self.other_ship().position).map(|s| s.direction);
+                                if let Some(p) = self.possible_pushes_at(self.other_ship().position, direction)
+                                    .into_iter()
+                                    .max_by_key(|p| current_rotation.map(|r| r.turn_count_to(p.direction).abs()).unwrap_or(2)) {
+                                    Some(p)
+                                } else {
+                                    return None;
+                                }
+                            } else {
+                                None
+                            };
+
+                            Some(Move::from_iter([
+                                acc.map(Action::Accelerate),
+                                turn.map(Action::Turn),
+                                Some(Action::advance(dist)),
+                                push.map(Action::Push),
+                            ].into_iter().flatten()))
+                        })
+                        .collect()
+                }
+            })
+            .collect()
     }
 
     /// Whether the player can move.

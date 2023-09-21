@@ -65,6 +65,12 @@ impl From<Action> for Move {
     }
 }
 
+impl FromIterator<Action> for Move {
+    fn from_iter<T>(iter: T) -> Self where T: IntoIterator<Item = Action> {
+        Self { actions: iter.into_iter().collect() }
+    }
+}
+
 impl Perform<Action> for Move {
     type Error = Infallible;
 
