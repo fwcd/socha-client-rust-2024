@@ -1,0 +1,73 @@
+<list>
+  <move>
+    <actions>
+      <acceleration acc="-2"/>
+      <advance distance="1"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="-1"/>
+      <advance distance="2"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="1"/>
+      <advance distance="3"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="2"/>
+      <advance distance="4"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="-1"/>
+      <turn direction="DOWN_RIGHT"/>
+      <advance distance="1"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <turn direction="DOWN_RIGHT"/>
+      <advance distance="2"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="1"/>
+      <turn direction="DOWN_RIGHT"/>
+      <advance distance="3"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="-2"/>
+      <turn direction="UP_RIGHT"/>
+      <advance distance="1"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="-1"/>
+      <turn direction="DOWN_LEFT"/>
+      <advance distance="1"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <turn direction="DOWN_LEFT"/>
+      <advance distance="2"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="1"/>
+      <turn direction="DOWN_LEFT"/>
+      <advance distance="3"/>
+    </actions>
+  </move>
+</list>
