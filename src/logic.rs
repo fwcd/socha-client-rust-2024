@@ -22,6 +22,6 @@ impl GameClientDelegate for OwnLogic {
     }
 
     fn on_update_state(&mut self, state: &State) {
-        debug!("State:\n{}", state);
+        info!("State:\n{}", state);
     }
 }
