@@ -710,7 +710,7 @@ mod tests {
 
     use indoc::indoc;
 
-    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field, FREE_ACC, Move}, util::{assert_xml_parse, Element}};
+    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field, FREE_ACC, Move}, util::{assert_xml_parse, Element, Perform}};
 
     #[test]
     fn test_xml_parses() {
@@ -872,11 +872,15 @@ mod tests {
     
         entries.sort_by_key(|e| e.file_name());
 
-        macro_rules! assert_moves_eq {
+        macro_rules! assert_moves_valid {
             ($state:expr, $moves:expr $(, $args:expr)*) => {
                 if let Some(ref state) = $state {
                     if let Some(ref moves) = $moves {
-                        ::pretty_assertions::assert_eq!(&state.sensible_moves(), moves $(, $args)*);
+                        let actual = state.sensible_moves();
+                        ::pretty_assertions::assert_eq!(&actual, moves $(, $args)*);
+                        for m in actual {
+                            state.child(m.clone()).expect(&format!("Could not perform {:?}!", m));
+                        }
                     }
                 }
             };
@@ -893,7 +897,7 @@ mod tests {
             if *split.last().unwrap() == "xml" {
                 let turn: usize = split[0].parse().unwrap();
                 if last_turn.map(|t| t != turn).unwrap_or(false) {
-                    assert_moves_eq!(state, moves, "{:?}", &moves_path);
+                    assert_moves_valid!(state, moves, "{:?}", &moves_path);
                     state = None;
                     moves = None;
                 }
@@ -913,6 +917,6 @@ mod tests {
             }
         }
 
-        assert_moves_eq!(state, moves, "{:?}", &moves_path);
+        assert_moves_valid!(state, moves, "{:?}", &moves_path);
     }
 }
