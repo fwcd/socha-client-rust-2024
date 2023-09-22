@@ -265,6 +265,15 @@ impl State {
         todo!()
     }
 
+    /// Fetches the simple moves for the current ship, falling back to the iterator of possible moves.
+    pub fn sensible_moves(&self) -> Vec<Move> {
+        let mut moves = self.simple_moves();
+        if moves.is_empty() {
+            moves.extend(self.possible_moves());
+        }
+        moves
+    }
+
     /// Fetches the possible moves.
     pub fn possible_moves(&self) -> MoveIterator {
         MoveIterator::new(self.clone())
@@ -867,7 +876,7 @@ mod tests {
             ($state:expr, $moves:expr $(, $args:expr)*) => {
                 if let Some(ref state) = $state {
                     if let Some(ref moves) = $moves {
-                        ::pretty_assertions::assert_eq!(&state.simple_moves(), moves $(, $args)*);
+                        ::pretty_assertions::assert_eq!(&state.sensible_moves(), moves $(, $args)*);
                     }
                 }
             };
