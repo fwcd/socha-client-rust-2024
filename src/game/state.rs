@@ -895,7 +895,9 @@ mod tests {
                         moves = Some(element.childs().map(|e| Move::try_from(e).unwrap()).collect());
                         moves_path = Some(entry.path().to_owned());
                     },
-                    "state" => state = Some(State::try_from(&element).unwrap()),
+                    "state" => {
+                        state = Some(State::try_from(&element).unwrap());
+                    },
                     _ => {},
                 }
                 last_turn = Some(turn);
