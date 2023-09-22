@@ -260,11 +260,6 @@ impl State {
         && matches!(self.board.get(ship.position), Some(Field::Goal))
     }
 
-    /// Fetches the winner, if any.
-    pub fn winner(&self) -> Option<Team> {
-        todo!()
-    }
-
     /// Fetches the simple moves for the current ship, falling back to the iterator of possible moves.
     pub fn sensible_moves(&self) -> Vec<Move> {
         let mut moves = self.simple_moves();
