@@ -789,7 +789,7 @@ mod tests {
                     },
                     Segment {
                         direction: CubeDir::Right,
-                        center: CubeVec::new(0, 4, -4),
+                        center: CubeVec::new(4, 0, -4),
                         fields: vec![
                             vec![
                                 Field::Water,
@@ -833,7 +833,7 @@ mod tests {
                 },
                 Ship {
                     team: Team::Two,
-                    position: CubeVec::new(1, -2, 1),
+                    position: CubeVec::new(-2, 1, 1),
                     direction: CubeDir::Right,
                     speed: 1,
                     free_turns: 1,

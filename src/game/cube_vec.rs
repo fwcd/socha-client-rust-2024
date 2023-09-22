@@ -32,6 +32,7 @@ impl CubeVec {
     /// Creates a new vector from the given cube components.
     #[inline]
     pub const fn new(q: i32, r: i32, s: i32) -> Self {
+        assert!(q + r + s == 0);
         Self { q, r, s }
     }
 
@@ -237,11 +238,11 @@ impl TryFrom<&Element> for CubeVec {
     type Error = Error;
 
     fn try_from(elem: &Element) -> Result<Self> {
-        Ok(CubeVec {
-            q: elem.attribute("q")?.parse()?,
-            r: elem.attribute("r")?.parse()?,
-            s: elem.attribute("s")?.parse()?,
-        })
+        Ok(CubeVec::new(
+            elem.attribute("q")?.parse()?,
+            elem.attribute("r")?.parse()?,
+            elem.attribute("s")?.parse()?,
+        ))
     }
 }
 
@@ -252,8 +253,8 @@ mod tests {
     #[test]
     fn test_xml_parses() {
         assert_xml_parse!(
-            r#"<position q="23" r="0" s="-2" />"#,
-            CubeVec::new(23, 0, -2)
+            r#"<position q="23" r="0" s="-23" />"#,
+            CubeVec::new(23, 0, -23)
         );
     }
 }
