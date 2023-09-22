@@ -388,7 +388,7 @@ impl Perform<Accelerate> for State {
             }
         }
 
-        self.current_ship().perform(acc).unwrap_infallible();
+        self.current_ship_mut().perform(acc).unwrap_infallible();
 
         if self.current_ship().coal < 0 {
             return Err(AccelerateProblem::InsufficientCoal);
