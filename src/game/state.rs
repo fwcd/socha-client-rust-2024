@@ -697,11 +697,11 @@ impl TryFrom<&Element> for State {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs::{read_dir, DirEntry, read_to_string, create_dir_all}, str::FromStr, path::PathBuf};
+    use std::{fs::{DirEntry, read_to_string, create_dir_all}, str::FromStr, path::PathBuf};
 
     use indoc::indoc;
 
-    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field, FREE_ACC, Move}, util::{assert_xml_parse, UnwrapInfallible, Element}};
+    use crate::{game::{State, Ship, CubeVec, Team, CubeDir, Board, Segment, Field, FREE_ACC, Move}, util::{assert_xml_parse, Element}};
 
     #[test]
     fn test_xml_parses() {

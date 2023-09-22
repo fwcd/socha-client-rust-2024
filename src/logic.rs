@@ -1,4 +1,4 @@
-use log::{info, debug};
+use log::info;
 
 use rand::{seq::SliceRandom, thread_rng};
 use socha_client_2024::{client::GameClientDelegate, game::{Move, Team, State}, util::Perform};
