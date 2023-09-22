@@ -854,7 +854,7 @@ mod tests {
     #[test]
     fn test_sensible_moves() {
         let manifest_dir = PathBuf::from_str(env!("CARGO_MANIFEST_DIR")).unwrap();
-        let game_dir = manifest_dir.join("test").join("example-game");
+        let game_dir = manifest_dir.join("resources").join("test").join("example-game");
 
         create_dir_all(&game_dir).unwrap();
         let mut entries: Vec<DirEntry> = game_dir.read_dir().unwrap()
