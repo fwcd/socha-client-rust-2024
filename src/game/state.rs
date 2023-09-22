@@ -863,11 +863,11 @@ mod tests {
     
         entries.sort_by_key(|e| e.file_name());
 
-        macro_rules! assert_moves_match {
-            ($state:expr, $moves:expr) => {
+        macro_rules! assert_moves_eq {
+            ($state:expr, $moves:expr $(, $args:expr)*) => {
                 if let Some(ref state) = $state {
                     if let Some(ref moves) = $moves {
-                        ::pretty_assertions::assert_eq!(&state.simple_moves(), moves);
+                        ::pretty_assertions::assert_eq!(&state.simple_moves(), moves $(, $args)*);
                     }
                 }
             };
@@ -875,6 +875,7 @@ mod tests {
 
         let mut state: Option<State> = None;
         let mut moves: Option<Vec<Move>> = None;
+        let mut moves_path: Option<PathBuf> = None;
         let mut last_turn: Option<usize> = None;
 
         for entry in entries {
@@ -883,14 +884,17 @@ mod tests {
             if *split.last().unwrap() == "xml" {
                 let turn: usize = split[0].parse().unwrap();
                 if last_turn.map(|t| t != turn).unwrap_or(false) {
-                    assert_moves_match!(state, moves);
+                    assert_moves_eq!(state, moves, "{:?}", &moves_path);
                     state = None;
                     moves = None;
                 }
                 let kind: &str = split[1];
                 let element = Element::from_str(&read_to_string(entry.path()).unwrap()).unwrap();
                 match kind {
-                    "moves" => moves = Some(element.childs().map(|e| Move::try_from(e).unwrap()).collect()),
+                    "moves" => {
+                        moves = Some(element.childs().map(|e| Move::try_from(e).unwrap()).collect());
+                        moves_path = Some(entry.path().to_owned());
+                    },
                     "state" => state = Some(State::try_from(&element).unwrap()),
                     _ => {},
                 }
@@ -898,6 +902,6 @@ mod tests {
             }
         }
 
-        assert_moves_match!(state, moves);
+        assert_moves_eq!(state, moves, "{:?}", &moves_path);
     }
 }
