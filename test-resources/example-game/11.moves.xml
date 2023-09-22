@@ -1,0 +1,29 @@
+<list>
+  <move>
+    <actions>
+      <acceleration acc="-2"/>
+      <turn direction="LEFT"/>
+      <advance distance="2"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="-1"/>
+      <turn direction="LEFT"/>
+      <advance distance="3"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="-1"/>
+      <turn direction="UP_LEFT"/>
+      <advance distance="2"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <turn direction="UP_LEFT"/>
+      <advance distance="3"/>
+    </actions>
+  </move>
+</list>

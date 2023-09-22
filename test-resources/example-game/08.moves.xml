@@ -1,0 +1,22 @@
+<list>
+  <move>
+    <actions>
+      <acceleration acc="-2"/>
+      <advance distance="1"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="-2"/>
+      <turn direction="DOWN_RIGHT"/>
+      <advance distance="1"/>
+    </actions>
+  </move>
+  <move>
+    <actions>
+      <acceleration acc="-1"/>
+      <turn direction="RIGHT"/>
+      <advance distance="2"/>
+    </actions>
+  </move>
+</list>

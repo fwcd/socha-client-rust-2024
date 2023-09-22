@@ -42,6 +42,7 @@ impl Ship {
     /// Accelerates the ship by the given amount.
     pub fn accelerate(&mut self, amount: i32) {
         self.speed += amount;
+        self.movement += amount;
     }
 
     /// The ship after being accelerated by the given amount.

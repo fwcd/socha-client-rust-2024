@@ -7,6 +7,7 @@ use std::io::{Write, Cursor, BufRead};
 use log::{warn, error, info, trace};
 use quick_xml::events::attributes::Attribute;
 use quick_xml::events::{Event, BytesStart, BytesText, BytesEnd};
+use quick_xml::name::QName;
 use quick_xml::{Reader, Writer};
 use super::{Result, Error};
 
@@ -42,7 +43,7 @@ impl Element {
         let mut buf = Vec::new();
         
         let element = loop {
-            match reader.read_event(&mut buf) {
+            match reader.read_event_into(&mut buf) {
                 Ok(Event::Start(ref start)) => {
                     trace!("Read start event");
                     let node = Element::try_from(start)?;
@@ -68,7 +69,7 @@ impl Element {
                             break Ok(node);
                         }
                     } else {
-                        error!("Found closing element </{}> without an opening element before", str::from_utf8(end.name())?);
+                        error!("Found closing element </{}> without an opening element before", str::from_utf8(end.name().as_ref())?);
                     }
                 },
                 Ok(Event::Text(ref t)) => {
@@ -94,7 +95,7 @@ impl Element {
     /// Serializes the node to an XML string using a tree traversal.
     pub fn write_to<W>(&self, writer: &mut Writer<W>) -> Result<()> where W: Write {
         self.write_to_impl(writer)?;
-        writer.inner().flush()?;
+        writer.get_mut().flush()?;
 
         Ok(())
     }
@@ -111,7 +112,7 @@ impl Element {
             
             // Write text
             if !self.content.is_empty() {
-                writer.write_event(Event::Text(BytesText::from_plain(self.content.as_bytes())))?;
+                writer.write_event(Event::Text(BytesText::new(&self.content)))?;
             }
 
             // Write child elements
@@ -120,7 +121,7 @@ impl Element {
             }
             
             // Write closing tag, e.g. </Element>
-            writer.write_event(Event::End(BytesEnd::borrowed(self.name.as_bytes())))?;
+            writer.write_event(Event::End(BytesEnd::new(&self.name)))?;
         }
 
         Ok(())
@@ -257,13 +258,13 @@ impl<'a> TryFrom<&BytesStart<'a>> for Element {
 
     fn try_from(start: &BytesStart<'a>) -> Result<Self> {
         Ok(Element {
-            name: str::from_utf8(start.name())?.to_owned(),
+            name: str::from_utf8(start.name().as_ref())?.to_owned(),
             content: String::new(),
             attributes: start.attributes()
                 .into_iter()
                 .map(|res| {
                     let attribute = res?;
-                    let key = str::from_utf8(attribute.key)?.to_owned();
+                    let key = str::from_utf8(attribute.key.as_ref())?.to_owned();
                     let value = str::from_utf8(&attribute.value)?.to_owned();
                     Ok((key, value))
                 })
@@ -275,9 +276,9 @@ impl<'a> TryFrom<&BytesStart<'a>> for Element {
 
 impl<'a> From<&'a Element> for BytesStart<'a> {
     fn from(element: &'a Element) -> Self {
-        BytesStart::borrowed_name(element.name.as_bytes())
+        BytesStart::new(&element.name)
             .with_attributes(element.attributes.iter().map(|(k, v)| Attribute {
-                key: k.as_bytes(),
+                key: QName(k.as_bytes()),
                 value: Cow::Borrowed(v.as_bytes()),
             }))
     }

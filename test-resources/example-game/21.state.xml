@@ -1,0 +1,171 @@
+<state startTeam="ONE" turn="21" currentTeam="TWO">
+  <board nextDirection="DOWN_RIGHT">
+    <segment direction="RIGHT">
+      <center q="0" r="0" s="0"/>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+    </segment>
+    <segment direction="RIGHT">
+      <center q="4" r="0" s="-4"/>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <passenger direction="UP_RIGHT" passenger="1"/>
+        <island/>
+        <island/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+    </segment>
+    <segment direction="RIGHT">
+      <center q="8" r="0" s="-8"/>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <island/>
+        <island/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+    </segment>
+    <segment direction="UP_RIGHT">
+      <center q="12" r="-4" s="-8"/>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <island/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <island/>
+        <water/>
+        <water/>
+        <water/>
+        <passenger direction="UP_LEFT" passenger="1"/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+    </segment>
+    <segment direction="RIGHT">
+      <center q="16" r="-4" s="-12"/>
+      <field-array>
+        <island/>
+        <water/>
+        <island/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <island/>
+        <water/>
+        <water/>
+        <passenger direction="UP_RIGHT" passenger="1"/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+    </segment>
+  </board>
+  <ship team="ONE" direction="RIGHT" speed="3" coal="0" passengers="0" freeTurns="1" points="13">
+    <position q="10" r="-1" s="-9"/>
+  </ship>
+  <ship team="TWO" direction="UP_RIGHT" speed="3" coal="1" passengers="0" freeTurns="1" points="8">
+    <position q="6" r="0" s="-6"/>
+  </ship>
+  <lastMove>
+    <actions>
+      <acceleration acc="1"/>
+      <advance distance="2"/>
+    </actions>
+  </lastMove>
+</state>

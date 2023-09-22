@@ -21,12 +21,12 @@ impl Segment {
 
     /// Converts local to global coordinates.
     pub fn local_to_global(&self, coords: CubeVec) -> CubeVec {
-        coords.rotated_by(self.direction.turns()) + self.center
+        coords.rotated_by(CubeDir::Right.turn_count_to(self.direction)) + self.center
     }
 
     /// Converts global to local coordinates.
     pub fn global_to_local(&self, coords: CubeVec) -> CubeVec {
-        (coords - self.center).rotated_by(-self.direction.turns())
+        (coords - self.center).rotated_by(self.direction.turn_count_to(CubeDir::Right))
     }
 
     /// Fetches the field at the given global position.

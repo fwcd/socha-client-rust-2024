@@ -1,0 +1,109 @@
+<state startTeam="ONE" turn="4" currentTeam="TWO">
+  <board nextDirection="UP_RIGHT">
+    <segment direction="RIGHT">
+      <center q="0" r="0" s="0"/>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+    </segment>
+    <segment direction="RIGHT">
+      <center q="4" r="0" s="-4"/>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <passenger direction="UP_RIGHT" passenger="1"/>
+        <island/>
+        <island/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+    </segment>
+    <segment direction="RIGHT">
+      <center q="8" r="0" s="-8"/>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <island/>
+        <island/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+      <field-array>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+        <water/>
+      </field-array>
+    </segment>
+  </board>
+  <ship team="ONE" direction="DOWN_RIGHT" speed="1" coal="5" passengers="0" freeTurns="1" points="1">
+    <position q="0" r="-1" s="1"/>
+  </ship>
+  <ship team="TWO" direction="RIGHT" speed="3" coal="5" passengers="0" freeTurns="1" points="5">
+    <position q="3" r="-1" s="-2"/>
+  </ship>
+  <lastMove>
+    <actions>
+      <turn direction="DOWN_RIGHT"/>
+      <advance distance="1"/>
+    </actions>
+  </lastMove>
+</state>

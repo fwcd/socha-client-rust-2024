@@ -14,8 +14,8 @@ use super::CubeDir;
 /// (see https://www.redblobgames.com/grids/hexagons/#coordinates-cube).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CubeVec {
-    r: i32,
     q: i32,
+    r: i32,
     s: i32,
 }
 
@@ -31,23 +31,28 @@ impl CubeVec {
 
     /// Creates a new vector from the given cube components.
     #[inline]
-    pub const fn new(r: i32, q: i32, s: i32) -> Self {
-        Self { r, q, s }
+    pub const fn new(q: i32, r: i32, s: i32) -> Self {
+        assert!(q + r + s == 0);
+        Self { q, r, s }
     }
 
     /// Creates a new vector from the given r/q components.
     #[inline]
-    pub const fn rq(r: i32, q: i32) -> Self {
-        Self { r, q, s: -q - r }
+    pub const fn qr(q: i32, r: i32) -> Self {
+        Self { q, r, s: -q - r }
     }
 
     /// The squared length of this vector.
     #[inline]
-    pub fn squared_length(self) -> i32 { self.r * self.r + self.q * self.q + self.s * self.s }
+    pub fn squared_length(self) -> i32 { self.q * self.q + self.r * self.r + self.s * self.s }
 
     /// The length of this vector.
     #[inline]
     pub fn length(self) -> f32 { (self.squared_length() as f32).sqrt() }
+
+    /// The distance to the given position.
+    #[inline]
+    pub fn distance_to(self, rhs: Self) -> u32 { (self.q.abs_diff(rhs.q) + self.r.abs_diff(rhs.r) + self.s.abs_diff(rhs.s)) / 2 }
 
     /// The inferred x component.
     #[inline]
@@ -59,11 +64,11 @@ impl CubeVec {
 
     /// The first component of this vector.
     #[inline]
-    pub fn r(self) -> i32 { self.r }
+    pub fn q(self) -> i32 { self.q }
 
     /// The second component of this vector.
     #[inline]
-    pub fn q(self) -> i32 { self.q }
+    pub fn r(self) -> i32 { self.r }
 
     /// The third component of this vector.
     #[inline]
@@ -94,7 +99,7 @@ impl Add for CubeVec {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        Self::new(self.r + rhs.r, self.q + rhs.q, self.s + rhs.s)
+        Self::new(self.q + rhs.q, self.r + rhs.r, self.s + rhs.s)
     }
 }
 
@@ -108,8 +113,8 @@ impl Add<CubeDir> for CubeVec {
 
 impl AddAssign<CubeVec> for CubeVec {
     fn add_assign(&mut self, rhs: Self) {
-        self.r += rhs.r;
         self.q += rhs.q;
+        self.r += rhs.r;
         self.s += rhs.s;
     }
 }
@@ -124,7 +129,7 @@ impl Sub for CubeVec {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
-        Self::new(self.r - rhs.r, self.q - rhs.q, self.s - rhs.s)
+        Self::new(self.q - rhs.q, self.r - rhs.r, self.s - rhs.s)
     }
 }
 
@@ -138,8 +143,8 @@ impl Sub<CubeDir> for CubeVec {
 
 impl SubAssign<CubeVec> for CubeVec {
     fn sub_assign(&mut self, rhs: Self) {
-        self.r -= rhs.r;
         self.q -= rhs.q;
+        self.r -= rhs.r;
         self.s -= rhs.s;
     }
 }
@@ -154,7 +159,7 @@ impl Mul<i32> for CubeVec {
     type Output = Self;
 
     fn mul(self, rhs: i32) -> Self {
-        Self::new(self.r * rhs, self.q * rhs, self.s * rhs)
+        Self::new(self.q * rhs, self.r * rhs, self.s * rhs)
     }
 }
 
@@ -162,14 +167,14 @@ impl Mul<CubeVec> for i32 {
     type Output = CubeVec;
 
     fn mul(self, rhs: CubeVec) -> CubeVec {
-        CubeVec::new(self * rhs.r, self * rhs.q, self * rhs.s)
+        CubeVec::new(self * rhs.q, self * rhs.r, self * rhs.s)
     }
 }
 
 impl MulAssign<i32> for CubeVec {
     fn mul_assign(&mut self, rhs: i32) {
-        self.r *= rhs;
         self.q *= rhs;
+        self.r *= rhs;
         self.s *= rhs;
     }
 }
@@ -178,14 +183,14 @@ impl Div<i32> for CubeVec {
     type Output = Self;
 
     fn div(self, rhs: i32) -> Self {
-        Self::new(self.r / rhs, self.q / rhs, self.s / rhs)
+        Self::new(self.q / rhs, self.r / rhs, self.s / rhs)
     }
 }
 
 impl DivAssign<i32> for CubeVec {
     fn div_assign(&mut self, rhs: i32) {
-        self.r /= rhs;
         self.q /= rhs;
+        self.r /= rhs;
         self.s /= rhs;
     }
 }
@@ -194,25 +199,25 @@ impl Neg for CubeVec {
     type Output = Self;
 
     fn neg(self) -> Self {
-        Self::new(-self.r, -self.q, -self.s)
+        Self::new(-self.q, -self.r, -self.s)
     }
 }
 
 impl fmt::Display for CubeVec {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {}, {})", self.r, self.q, self.s)
+        write!(f, "({}, {}, {})", self.q, self.r, self.s)
     }
 }
 
 impl From<CubeDir> for CubeVec {
     fn from(dir: CubeDir) -> Self {
         match dir {
-            CubeDir::Right => Self::rq(1, 0),
-            CubeDir::DownRight => Self::rq(0, 1),
-            CubeDir::DownLeft => Self::rq(-1, 1),
-            CubeDir::Left => Self::rq(-1, 0),
-            CubeDir::UpLeft => Self::rq(0, -1),
-            CubeDir::UpRight => Self::rq(1, -1),
+            CubeDir::Right => Self::qr(1, 0),
+            CubeDir::DownRight => Self::qr(0, 1),
+            CubeDir::DownLeft => Self::qr(-1, 1),
+            CubeDir::Left => Self::qr(-1, 0),
+            CubeDir::UpLeft => Self::qr(0, -1),
+            CubeDir::UpRight => Self::qr(1, -1),
         }
     }
 }
@@ -223,13 +228,13 @@ impl<T> From<Vec2<T>> for CubeVec where T: Into<i32> {
         let x: i32 = vec.x.into();
         let y: i32 = vec.y.into();
         let r = y - 2;
-        CubeVec::rq(x - 1 - r.max(0), r)
+        CubeVec::qr(x - 1 - r.max(0), r)
     }
 }
 
 impl From<CubeVec> for [i32; 3] {
     fn from(vec: CubeVec) -> Self {
-        [vec.r, vec.q, vec.s]
+        [vec.q, vec.r, vec.s]
     }
 }
 
@@ -238,8 +243,8 @@ impl TryFrom<&Element> for CubeVec {
 
     fn try_from(elem: &Element) -> Result<Self> {
         Ok(CubeVec::new(
-            elem.attribute("r")?.parse()?,
             elem.attribute("q")?.parse()?,
+            elem.attribute("r")?.parse()?,
             elem.attribute("s")?.parse()?,
         ))
     }
@@ -252,8 +257,8 @@ mod tests {
     #[test]
     fn test_xml_parses() {
         assert_xml_parse!(
-            r#"<position r="23" q="0" s="-2" />"#,
-            CubeVec::new(23, 0, -2)
+            r#"<position q="23" r="0" s="-23" />"#,
+            CubeVec::new(23, 0, -23)
         );
     }
 }
