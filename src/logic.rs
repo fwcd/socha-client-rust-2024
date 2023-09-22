@@ -1,7 +1,7 @@
 use log::info;
 
 use rand::{seq::SliceRandom, thread_rng};
-use socha_client_2024::{client::GameClientDelegate, game::{Move, Team, State}, util::Perform};
+use socha_client_2024::{client::GameClientDelegate, game::{Move, Team, State}};
 
 /// An empty game logic structure that implements the client delegate trait
 /// and thus is responsible e.g. for picking a move when requested.
@@ -15,9 +15,6 @@ impl GameClientDelegate for OwnLogic {
             .expect("No move found!")
             .clone();
         info!("Chose move {:?}", chosen_move);
-        // Verify that the move actually works
-        // TODO: Make this a debug assert or similar
-        state.child(chosen_move.clone()).expect("The move should be performable");
         chosen_move
     }
 
