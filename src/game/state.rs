@@ -867,7 +867,7 @@ mod tests {
             ($state:expr, $moves:expr) => {
                 if let Some(ref state) = $state {
                     if let Some(ref moves) = $moves {
-                        assert_eq!(&state.simple_moves(), moves);
+                        ::pretty_assertions::assert_eq!(&state.simple_moves(), moves);
                     }
                 }
             };
