@@ -11,7 +11,7 @@ macro_rules! assert_xml_parse {
                 for<'a> T: Debug + Eq + TryFrom<&'a Element, Error = Error>,
             {
                 let element = Element::from_str(xml).unwrap();
-                assert_eq!(
+                ::pretty_assertions::assert_eq!(
                     T::try_from(&element).unwrap(),
                     expected
                 )
@@ -29,7 +29,7 @@ macro_rules! assert_xml_format {
 
             use crate::util::Element;
 
-            assert_eq!(
+            ::pretty_assertions::assert_eq!(
                 Element::try_from($actual).unwrap(),
                 Element::from_str($xml).unwrap()
             )
@@ -50,7 +50,7 @@ macro_rules! assert_xml_roundtrip {
                 for<'a> T: Clone + Debug + Eq + Into<Element> + TryFrom<&'a Element, Error = Error>,
             {
                 let element = value.clone().into();
-                assert_eq!(
+                ::pretty_assertions::assert_eq!(
                     T::try_from(&element).unwrap(),
                     value
                 )
