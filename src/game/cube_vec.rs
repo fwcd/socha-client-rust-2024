@@ -50,6 +50,10 @@ impl CubeVec {
     #[inline]
     pub fn length(self) -> f32 { (self.squared_length() as f32).sqrt() }
 
+    /// The distance to the given position.
+    #[inline]
+    pub fn distance_to(self, rhs: Self) -> u32 { (self.q.abs_diff(rhs.q) + self.r.abs_diff(rhs.r) + self.s.abs_diff(rhs.s)) / 2 }
+
     /// The inferred x component.
     #[inline]
     pub fn x(self) -> i32 { self.q * 2 + self.r }

@@ -47,14 +47,14 @@ impl Board {
     /// Fetches the field at the given position.
     pub fn get(&self, coords: CubeVec) -> Option<&Field> {
         self.segments.iter()
-            .find(|s| (s.center - coords).length() <= 3.0)
+            .find(|s| coords.distance_to(s.center) <= 3)
             .and_then(|s| s.get_global(coords))
     }
 
     /// Fetches the field at the given position mutably.
     pub fn get_mut(&mut self, coords: CubeVec) -> Option<&mut Field> {
         self.segments.iter_mut()
-            .find(|s| (s.center - coords).length() <= 3.0)
+            .find(|s| coords.distance_to(s.center) <= 3)
             .and_then(|s| s.get_global_mut(coords))
     }
 
