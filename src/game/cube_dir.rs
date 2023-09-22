@@ -34,9 +34,10 @@ impl CubeDir {
         self as i32
     }
 
-    /// Clockwise turns to the target (in `(-3)..3`).
+    /// Clockwise turns to the target (in `(-2)..=3`).
     pub fn turn_count_to(self, target: Self) -> i32 {
-        ((Self::COUNT as i32 + target.turns() - self.turns() + 3) % Self::COUNT as i32) - 3
+        let diff = (target.turns() - self.turns()).rem_euclid(6);
+        if diff > 3 { diff - Self::COUNT as i32 } else { diff }
     }
 
     /// Rotates the direction by the given number of turns.
@@ -54,14 +55,7 @@ impl Neg for CubeDir {
     type Output = Self;
 
     fn neg(self) -> Self {
-        match self {
-            Self::Right => Self::Left,
-            Self::DownRight => Self::UpLeft,
-            Self::DownLeft => Self::UpRight,
-            Self::Left => Self::Right,
-            Self::UpLeft => Self::DownRight,
-            Self::UpRight => Self::DownLeft,
-        }
+        Self::ALL[(self as usize + 3) % Self::COUNT]
     }
 }
 
@@ -103,7 +97,7 @@ mod tests {
         assert_eq!(CubeDir::Right.turn_count_to(CubeDir::Right), 0);
         assert_eq!(CubeDir::Right.turn_count_to(CubeDir::DownRight), 1);
         assert_eq!(CubeDir::Right.turn_count_to(CubeDir::DownLeft), 2);
-        assert_eq!(CubeDir::Right.turn_count_to(CubeDir::Left), -3);
+        assert_eq!(CubeDir::Right.turn_count_to(CubeDir::Left), 3);
         assert_eq!(CubeDir::Right.turn_count_to(CubeDir::UpLeft), -2);
         assert_eq!(CubeDir::Right.turn_count_to(CubeDir::UpRight), -1);
 
@@ -111,7 +105,7 @@ mod tests {
         assert_eq!(CubeDir::DownRight.turn_count_to(CubeDir::DownRight), 0);
         assert_eq!(CubeDir::DownRight.turn_count_to(CubeDir::DownLeft), 1);
         assert_eq!(CubeDir::DownRight.turn_count_to(CubeDir::Left), 2);
-        assert_eq!(CubeDir::DownRight.turn_count_to(CubeDir::UpLeft), -3);
+        assert_eq!(CubeDir::DownRight.turn_count_to(CubeDir::UpLeft), 3);
         assert_eq!(CubeDir::DownRight.turn_count_to(CubeDir::UpRight), -2);
     }
 }
