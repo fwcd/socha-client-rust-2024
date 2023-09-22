@@ -83,7 +83,7 @@ impl<D> GameClient<D> where D: GameClientDelegate {
         let mut writer = Writer::new(BufWriter::new(write));
 
         // Write <protocol>
-        writer.write_event(XmlEvent::Start(BytesStart::borrowed_name(b"protocol")))?;
+        writer.write_event(XmlEvent::Start(BytesStart::new("protocol")))?;
         
         // Send join request
         let join_xml: Element = match self.reservation_code {
@@ -95,8 +95,8 @@ impl<D> GameClient<D> where D: GameClientDelegate {
 
         // Read <protocol>
         loop {
-            match reader.read_event(&mut buf)? {
-                XmlEvent::Start(ref start) if start.name() == b"protocol" => {
+            match reader.read_event_into(&mut buf)? {
+                XmlEvent::Start(ref start) if start.name().as_ref() == b"protocol" => {
                     info!("Performed handshake");
                     break
                 },
