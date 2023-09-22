@@ -47,15 +47,15 @@ impl Board {
     /// Fetches the field at the given position.
     pub fn get(&self, coords: CubeVec) -> Option<&Field> {
         self.segments.iter()
-            .find(|s| coords.distance_to(s.center) <= 3)
-            .and_then(|s| s.get_global(coords))
+            .filter(|s| coords.distance_to(s.center) <= 3)
+            .find_map(|s| s.get_global(coords))
     }
 
     /// Fetches the field at the given position mutably.
     pub fn get_mut(&mut self, coords: CubeVec) -> Option<&mut Field> {
         self.segments.iter_mut()
-            .find(|s| coords.distance_to(s.center) <= 3)
-            .and_then(|s| s.get_global_mut(coords))
+            .filter(|s| coords.distance_to(s.center) <= 3)
+            .find_map(|s| s.get_global_mut(coords))
     }
 
     /// Checks whether the field has a current.
