@@ -12,7 +12,7 @@ use logic::OwnLogic;
 #[derive(Parser, Debug)]
 struct Args {
     /// The game server's host address.
-    #[clap(long, default_value = "localhost")]
+    #[clap(short, long, default_value = "localhost")]
     host: String,
     /// The game server's port.
     #[clap(short, long, default_value_t = 13050)]
