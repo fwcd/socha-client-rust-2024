@@ -10,7 +10,7 @@ use logic::OwnLogic;
 
 /// Software Challenge 2024 client.
 #[derive(Parser, Debug)]
-#[clap(disable_help_flag = true)]
+#[command(disable_help_flag = true)]
 struct Args {
     /// The game server's host address.
     #[clap(short, long, default_value = "localhost")]
