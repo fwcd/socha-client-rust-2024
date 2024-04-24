@@ -10,6 +10,7 @@ use logic::OwnLogic;
 
 /// Software Challenge 2024 client.
 #[derive(Parser, Debug)]
+#[command(disable_help_flag = true)]
 struct Args {
     /// The game server's host address.
     #[clap(short, long, default_value = "localhost")]
@@ -29,6 +30,9 @@ struct Args {
     /// Prints outgoing XML messages to the console for debugging.
     #[clap(short = 'D', long)]
     debug_writer: bool,
+    /// Prints this help.
+    #[clap(long, action = clap::ArgAction::HelpLong)]
+    help: Option<bool>,
 }
 
 fn main() {
