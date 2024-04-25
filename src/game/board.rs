@@ -104,7 +104,7 @@ impl Board {
     /// Removes a passenger at the given position.
     fn remove_passenger_at(&mut self, coords: CubeVec) -> bool {
         for d in CubeDir::ALL {
-            if let Some(Field::Passenger { direction, passenger }) = self.get_mut(coords) {
+            if let Some(Field::Passenger { direction, passenger }) = self.get_mut(coords + d) {
                 if *passenger > 0 && *direction == -d {
                     *passenger -= 1;
                     return true;
